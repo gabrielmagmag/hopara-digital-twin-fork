@@ -4,7 +4,7 @@ Hopara is an open source digital twin plataform, where you can easily build a di
 
 The original version of this project was built at MIT by Michael Stonebraker (Postgres), Wenbo Tao and Remco Chang.
 
-https://github.com/user-attachments/assets/03b1cd96-92cf-479a-b82d-90259085297d
+https://github.com/user-attachments/assets/d99ddf9d-5a49-49ba-aa21-a8cb59710d2f
 
 ## To start using it
 
