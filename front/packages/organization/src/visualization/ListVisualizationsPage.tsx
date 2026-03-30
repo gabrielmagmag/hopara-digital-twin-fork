@@ -101,6 +101,13 @@ const ListVisualizationsPage = () => {
     }
   }, [])
 
+  const sampleVisualizations = visualizations.filter(
+    (visualization) => visualization.group?.toLowerCase() === 'sample'
+  )
+  const notSampleVisualizations = visualizations.filter(
+    (visualization) => visualization.group?.toLowerCase() !== 'sample'
+  )
+
   useEffect(() => {
     (async () => {
       const tenantPromise = dataSourceContext.tenantService.get(authContext.authorization.tenant, 
@@ -124,12 +131,6 @@ const ListVisualizationsPage = () => {
     })()
   }, [poolingCount])
 
-  const sampleVisualizations = visualizations.filter(
-    (visualization) => visualization.group?.toLowerCase() === 'sample'
-  )
-  const notSampleVisualizations = visualizations.filter(
-    (visualization) => visualization.group?.toLowerCase() !== 'sample'
-  )
   const shouldShowOnboarding = !loading && !dataSourcesLoading && !notSampleVisualizations.length && authContext.authorization.canEditDataSources()
   const shouldShowYourVisualizationsTitle = (!loading && notSampleVisualizations.length) || shouldShowOnboarding
   const personalSpace = isPersonalSpace(
