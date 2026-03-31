@@ -160,7 +160,7 @@ const configMap = {
   },
   MAPTILER_API_TOKEN: { development: 't0AYWwS0LsMuX1Of2myK&c=adasd' },
   GOOGLE_MAPS_API_KEY: {
-    development: 'AIzaSyAC42qeOUIZ0j7T-b_c9MXvG3-Wtld8Be4',
+    development: '',
   },
 
   // DATADOG

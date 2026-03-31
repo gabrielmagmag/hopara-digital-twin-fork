@@ -102,6 +102,7 @@ jobs:
         env:
           REACT_APP_AUTH_ENABLED: 'false'
           REACT_APP_CLOUD_FEATURES_ENABLED: 'false'
+          REACT_APP_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
