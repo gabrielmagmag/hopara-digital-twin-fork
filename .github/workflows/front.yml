@@ -122,3 +122,4 @@ jobs:
           tags: |
             hopara/front:latest
             hopara/front:${{ github.run_number }}
+            
