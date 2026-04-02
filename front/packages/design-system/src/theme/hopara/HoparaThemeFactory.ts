@@ -1,5 +1,5 @@
-import { ThemeFactory } from "../ThemeFactory";
-import { ThemeSpec } from "../ThemeSpec";
+import { ThemeFactory } from '../ThemeFactory'
+import { ThemeSpec } from '../ThemeSpec'
 import * as materialYouColorUtilities from '@material/material-color-utilities'
 import { HoparaTheme } from './HoparaTheme'
 

@@ -1,4 +1,4 @@
-import { ThemeSpec } from "./ThemeSpec";
+import { ThemeSpec } from './ThemeSpec'
 
 export const ThemeFactoryToken = Symbol('ThemeFactory')
 

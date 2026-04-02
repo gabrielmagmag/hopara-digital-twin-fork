@@ -172,7 +172,7 @@ const ListVisualizationsPage = () => {
           notSampleVisualizations={notSampleVisualizations}
           areSampleVisualizationsReady={areSampleVisualizationsReady || 
                                         areSampleVisualizationsReady === undefined || 
-                                        sampleVisualizations.length >= SAMPLE_VISUALIZATIONS_COUNT    }
+                                        sampleVisualizations.length >= SAMPLE_VISUALIZATIONS_COUNT }
           tenant={tenant}
           onDelete={async (visualizationId) => {
             setVisualizations(
