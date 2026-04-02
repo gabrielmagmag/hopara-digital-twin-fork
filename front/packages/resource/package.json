@@ -21,7 +21,7 @@
     "@loaders.gl/images": "^3.0.0",
     "@luma.gl/constants": "^8.5.20",
     "@luma.gl/core": "^8.5.20",
-    "lodash": "~4.17.23",
+    "lodash": "~4.18.1",
     "query-string": "^6.13.8"
   }
 }
