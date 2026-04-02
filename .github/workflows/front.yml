@@ -80,9 +80,33 @@ jobs:
             front/packages/**/tests/golden-images/temp/**
             front/packages/**/tests/golden-images/diff/**
 
+  perf-test:
+    name: Perf Test
+    runs-on: ubuntu-latest
+    container:
+      image: hopara/node-chrome:latest
+    env:
+      TZ: America/Sao_Paulo
+      DISABLE_ESLINT_PLUGIN: 'true'
+      TSC_COMPILE_ON_ERROR: 'true'
+      PORT: 3456
+      REACT_APP_HOPARA_ENV: systemTest
+      HTML_VERSION: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build web (profile)
+        run: yarn build-web --profile
+
+      - name: Run perf tests
+        run: yarn perf-test
+
   build-and-push:
     name: Build & Push Image
-    needs: [test, lint, system-test]
+    needs: [test, lint, system-test, perf-test]
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     env:
