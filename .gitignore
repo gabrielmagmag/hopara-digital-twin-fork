@@ -1,2 +1,4 @@
 storage/
 .idea/
+node_modules/
+.yarn/
