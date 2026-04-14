@@ -651,6 +651,15 @@ class TestImageService(unittest.TestCase):
                             invalidate=True,
                             data={
                                 'origin': f'{any_new_version}/raw_225',
+                                'destination': f'{any_new_version}/512_225.webp',
+                                'max_size': 512,
+                            }
+                        ),
+                        step(
+                            'image_resize',
+                            invalidate=True,
+                            data={
+                                'origin': f'{any_new_version}/raw_225',
                                 'destination': f'{any_new_version}/256_225.webp',
                                 'max_size': 256,
                             }
