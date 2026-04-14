@@ -143,6 +143,16 @@ class TestImageService(unittest.TestCase):
                     'type': 'image_resize',
                     'data': {
                         'origin': f'{any_new_version}/raw',
+                        'destination': f'{any_new_version}/512.webp',
+                        'max_size': 512,
+                    },
+                    'invalidation_urls': [f'{invalidation_base_path}/{name}*', invalidation_base_shape_path]
+                },
+                {
+                    "cwd": cwd,
+                    'type': 'image_resize',
+                    'data': {
+                        'origin': f'{any_new_version}/raw',
                         'destination': f'{any_new_version}/1024.webp',
                         'max_size': 1024,
                     },
@@ -333,6 +343,16 @@ class TestImageService(unittest.TestCase):
                             'type': 'image_resize',
                             'data': {
                                 'origin': f'{any_new_version}/raw',
+                                'destination': f'{any_new_version}/512.webp',
+                                'max_size': 512
+                            },
+                            'invalidation_urls': invalidation_urls
+                        }
+                        {
+                            'cwd': cwd,
+                            'type': 'image_resize',
+                            'data': {
+                                'origin': f'{any_new_version}/raw',
                                 'destination': f'{any_new_version}/256.webp',
                                 'max_size': 256
                             },
@@ -505,6 +525,15 @@ class TestImageService(unittest.TestCase):
                             invalidate=True,
                             data={
                                 'origin': f'{any_new_version}/raw_45',
+                                'destination': f'{any_new_version}/512_45.webp',
+                                'max_size': 512,
+                            }
+                        ),
+                        step(
+                            'image_resize',
+                            invalidate=True,
+                            data={
+                                'origin': f'{any_new_version}/raw_45',
                                 'destination': f'{any_new_version}/256_45.webp',
                                 'max_size': 256,
                             }
@@ -552,6 +581,15 @@ class TestImageService(unittest.TestCase):
                                 'origin': f'{any_new_version}/raw_135',
                                 'destination': f'{any_new_version}/1024_135.webp',
                                 'max_size': 1024,
+                            }
+                        ),
+                        step(
+                            'image_resize',
+                            invalidate=True,
+                            data={
+                                'origin': f'{any_new_version}/raw_135',
+                                'destination': f'{any_new_version}/512_135.webp',
+                                'max_size': 512,
                             }
                         ),
                         step(
@@ -660,6 +698,15 @@ class TestImageService(unittest.TestCase):
                                 'origin': f'{any_new_version}/raw_315',
                                 'destination': f'{any_new_version}/1024_315.webp',
                                 'max_size': 1024,
+                            }
+                        ),
+                        step(
+                            'image_resize',
+                            invalidate=True,
+                            data={
+                                'origin': f'{any_new_version}/raw_315',
+                                'destination': f'{any_new_version}/512_315.webp',
+                                'max_size': 512,
                             }
                         ),
                         step(
