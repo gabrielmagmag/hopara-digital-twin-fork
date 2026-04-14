@@ -1,11 +1,17 @@
 import React from 'react'
 import {PureComponent} from '../component/PureComponent'
 import {debounce} from 'lodash/fp'
-import Editor from '@monaco-editor/react'
+import Editor, {loader} from '@monaco-editor/react'
 import {Theme, withTheme} from '../theme'
 import {Box} from '@mui/material'
 import {Icon} from '../icons/Icon'
 import { Tooltip } from '../tooltip/Tooltip'
+
+loader.config({
+  paths: {
+    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs',
+  },
+})
 
 export enum CodeEditorFontSize {
   Small = 12,
