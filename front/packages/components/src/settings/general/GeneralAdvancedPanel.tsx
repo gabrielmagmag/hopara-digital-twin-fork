@@ -106,7 +106,7 @@ const typeToSchema = {
 }
 
 const visualizationProperties = ['id', 'mapStyle', 'refreshPeriod', 'encodingScope', 'autoNavigation', 
-                                 'scope', 'historyBack', 'animationFps', 'backgroundColor']
+                                 'scope', 'historyBack', 'animationFps', 'bleedFactor', 'backgroundColor']
 
 function mapState(state: Store): StateProps {
   const visualization = state.visualizationStore.visualization
