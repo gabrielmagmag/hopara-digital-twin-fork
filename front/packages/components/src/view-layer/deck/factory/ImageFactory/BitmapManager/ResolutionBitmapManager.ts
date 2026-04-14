@@ -4,16 +4,18 @@ import { BitmapManager } from './BitmapManager'
 
 enum ImageBreakpoint {
   tb = 0,
-  xs = 1,
-  sm = 2,
-  md = 3,
-  lg = 4,
-  xl = 5,
+  xxs = 1,
+  xs = 2,
+  sm = 3,
+  md = 4,
+  lg = 5,
+  xl = 6,
 
 }
 
 const SIZE_BREAKPOINTS = {
   [ImageBreakpoint.tb]: 'tb',
+  [ImageBreakpoint.xxs]: 'xxs',
   [ImageBreakpoint.xs]: 'xs',
   [ImageBreakpoint.sm]: 'sm',
   [ImageBreakpoint.md]: 'md',
@@ -23,6 +25,7 @@ const SIZE_BREAKPOINTS = {
 
 const resolutions = {
   [ImageBreakpoint.tb]: 250,
+  [ImageBreakpoint.xxs]: 512,
   [ImageBreakpoint.xs]: 1024,
   [ImageBreakpoint.sm]: 2048,
   [ImageBreakpoint.md]: 4096,

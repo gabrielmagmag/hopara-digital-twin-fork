@@ -5,6 +5,7 @@ import { VIEW_MANAGED_FIELD, ViewEncoding } from './ViewEncoding'
 
 export enum ImageResolution {
   tb = 'tb',
+  xxs = 'xxs',
   xs = 'xs',
   sm = 'sm',
   md = 'md',

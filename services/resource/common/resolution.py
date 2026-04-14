@@ -2,10 +2,11 @@ from typing import Literal, Optional
 
 from common.dictionary import get_with_default
 
-ResolutionType = Literal['tb', 'xs', 'sm', 'md', 'lg', 'xl']
+ResolutionType = Literal['tb', 'xxs', 'xs', 'sm', 'md', 'lg', 'xl']
 
 sizes: dict[ResolutionType, int] = {
     'tb': 256,
+    'xxs': 512,
     'xs': 1024,
     'sm': 2048,
     'md': 4096,

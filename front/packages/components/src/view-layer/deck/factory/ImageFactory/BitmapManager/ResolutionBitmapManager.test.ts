@@ -39,19 +39,19 @@ describe('get the largest resolution for bounds list', () => {
   it('xs', () => {
     const manager = new ResolutionBitmapManager(Number.MAX_SAFE_INTEGER, true)
     const resolution = manager.getImagesBreakpoint(testViewport(), [testBounds(300, 300, 700, 700)])
-    expect(resolution).toBe(1)
+    expect(resolution).toBe(2)
   })
 
   it('md', () => {
     const manager = new ResolutionBitmapManager(Number.MAX_SAFE_INTEGER, true)
     const resolution = manager.getImagesBreakpoint(testViewport({zoom: 2}), [testBounds(300, 300, 700, 700)])
-    expect(resolution).toBe(3)
+    expect(resolution).toBe(4)
   })
 
   it('xl', () => {
     const manager = new ResolutionBitmapManager(Number.MAX_SAFE_INTEGER, true)
     const resolution = manager.getImagesBreakpoint(testViewport({zoom: 4}), [testBounds(300, 300, 700, 700)])
-    expect(resolution).toBe(5)
+    expect(resolution).toBe(6)
   })
 
   it('multiple bounds get the first', () => {
@@ -60,7 +60,7 @@ describe('get the largest resolution for bounds list', () => {
       testBounds(0, 0, 1500, 1500),
       testBounds(300, 300, 700, 700),
     ])
-    expect(resolution).toBe(3)
+    expect(resolution).toBe(4)
   })
 
   it('multiple bounds zoomed', () => {
@@ -69,6 +69,6 @@ describe('get the largest resolution for bounds list', () => {
       testBounds(300, 300, 700, 700),
       testBounds(0, 0, 1500, 1500),
     ])
-    expect(resolution).toBe(5)
+    expect(resolution).toBe(6)
   })
 })

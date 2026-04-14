@@ -5,6 +5,7 @@ export interface ViewEncoding {
 
 export enum ImageResolution {
   tb = 'tb',
+  xxs = 'xxs',
   xs = 'xs',
   sm = 'sm',
   md = 'md',
