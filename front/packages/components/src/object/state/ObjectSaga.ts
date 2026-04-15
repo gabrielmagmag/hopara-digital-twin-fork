@@ -122,6 +122,7 @@ export function* fetchObjects(
 function* fetchEntityObjects(
   action: ReturnType<
     | typeof actions.object.typeSelected
+    | typeof actions.object.typeChanged
     | typeof actions.objectList.search
     | typeof actions.objectList.paginate
   >
@@ -133,7 +134,7 @@ function* fetchEntityObjects(
   const layer = yield select((store: Store) => store.layerStore.layers.getByRowsetId(rowsetId))
   if (!layer.getPositionEncoding()) return
 
-  if ( isActionOf([actions.object.typeSelected], action) && 
+  if ( isActionOf([actions.object.typeSelected, actions.object.typeChanged], action) && 
        paginatedRowset.status !== PaginatedRowsetStatus.NONE) {
      return
   }
@@ -299,7 +300,7 @@ export function* updateType(action: ReturnType<typeof actions.details.open>) {
 
   const selectedId = getItemFromSameLayerData(objectMenu.items, action.payload.layerId, layers)?.id
   if ( selectedId && selectedId !== objectMenu.selectedId ) {
-    yield put(actions.object.typeSelected({id: selectedId, rowsetId: layers.getById(selectedId)?.getRowsetId()}))
+    yield put(actions.object.typeChanged({id: selectedId, rowsetId: layers.getById(selectedId)?.getRowsetId()}))
   }
 }
 
@@ -311,6 +312,7 @@ export const objectSagas = () => [
   takeEvery(actions.objectList.fetch.request, fetchObjects),
   takeEvery(actions.objectList.paginate, fetchEntityObjects),
   takeEvery(actions.object.typeSelected, fetchEntityObjects),
+  takeEvery(actions.object.typeChanged, fetchEntityObjects),
   takeEvery(actions.object.placeClickedMobile, placeWithUserLocation),
   takeEvery(actions.object.titleChanged, updateTitle),
   takeEvery(actions.object.place.request, placeWithScreenCoordinates),

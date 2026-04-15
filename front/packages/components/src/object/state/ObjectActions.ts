@@ -85,5 +85,6 @@ export const objectActions = {
   fieldsUpdated: createAction('OBJECT_FIELDS_UPDATED')<FieldsUpdatedPayload>(),
   zIndexUpdated: createAction('OBJECT_Z_INDEX_UPDATED')<FieldsUpdatedPayload>(),
   appearanceUpdated: createAction('APPEARANCE_UPDATED')<AppearanceUpdatePayload>(),
+  typeChanged: createAction('OBJECT_TYPE_CHANGED')<{ id?: string, rowsetId?: string }>(),
   typeSelected: createAction('OBJECT_TYPE_SELECTED')<{ id?: string, rowsetId?: string }>()
 }
