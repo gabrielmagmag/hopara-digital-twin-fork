@@ -30,7 +30,7 @@ jobs:
         env:
           SERVICES: s3,cloudfront,sqs
           AWS_DEFAULT_REGION: us-east-1
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+          LOCALSTACK_AUTH_TOKEN: ${{ vars.LOCALSTACK_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,7 +61,7 @@ jobs:
         env:
           SERVICES: s3,cloudfront,sqs
           AWS_DEFAULT_REGION: us-east-1
-          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+          LOCALSTACK_AUTH_TOKEN: ${{ vars.LOCALSTACK_AUTH_TOKEN }}
     env:
       DD_TRACE_ENABLED: "false"
       LOG_LEVEL: warn
