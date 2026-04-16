@@ -3,6 +3,7 @@ import {httpGet, httpPost, httpPut, httpPutFormData, OnUploadFunction} from '@ho
 import {Authorization} from '@hopara/authorization'
 import {i18n} from '@hopara/i18n'
 import {getBaseResourceUrl, ResourceHistoryItem, ResourceType} from '@hopara/resource'
+import { isNil } from 'lodash'
 
 export const DEFAULT_RESOURCE_LIBRARY = 'default'
 
@@ -99,15 +100,21 @@ export class ResourceRepository {
       authorization)
   }
 
-  static async getShape(resourceId: string, library: string | undefined, authorization: Authorization, fallbackId?: string): Promise<any> {
+  static async getShape(resourceId: string, library: string | undefined, view: number | undefined, authorization: Authorization, fallbackId?: string): Promise<any> {
     const baseUrl = getBaseResourceUrl(resourceId, library, authorization.tenant, ResourceType.image)
+
+    const params: Record<string, string> = {}
     if (fallbackId) {
-      baseUrl.searchParams.append('fallback', fallbackId)
+      params.fallback = fallbackId
     }
+    if (!isNil(view)) {
+      params.angle = view.toString()
+    }
+    
     const response = await httpGet(
       Config.getValue('RESOURCE_API_ADDRESS'),
       baseUrl + '/shape',
-      {},
+      params,
       authorization,
       {headers: {accept: 'application/json'}},
     )

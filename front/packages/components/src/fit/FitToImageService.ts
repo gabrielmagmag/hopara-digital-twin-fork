@@ -99,9 +99,10 @@ export class FitToImageService {
       if (!fitRow) return
 
       const resourceId = fitRow.imageEncoding?.getId(fitRow.row)
+      const view = fitRow.imageEncoding?.getView(fitRow.row)
 
       try {
-        const shape = await ResourceRepository.getShape(resourceId, fitRow.imageEncoding?.scope, authorization)
+        const shape = await ResourceRepository.getShape(resourceId, fitRow.imageEncoding?.scope, view, authorization)
         return { row: fitRow.row, shape, dimensions: fitRow.imageDimensions }
       } catch {
         return { row: fitRow.row }
