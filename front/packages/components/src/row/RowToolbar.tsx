@@ -389,7 +389,7 @@ export class RowToolbar extends PureComponent<StateProps & ActionProps, {
               tooltipPlacement="top"
               disabled={!cloudFeaturesEnabled || this.props.isFitting}
               onClick={() => this.props.onFitToBuildingClick()}/>}
-            {this.props.allowImageEdit && <CanvasNavigationButton
+            {this.props.canUpload && <CanvasNavigationButton
               icon="image-history"
               label={i18n('SHOW_IMAGE_HISTORY')}
               tooltipPlacement="top"
