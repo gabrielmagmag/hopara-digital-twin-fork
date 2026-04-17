@@ -19,6 +19,13 @@ export class OrthographicBounds extends BaseBounds {
     const bottomLeftPoint = this.nearestPoint([minX, minY], geometry)
     const topLeftPoint = this.nearestPoint([minX, maxY], geometry)
 
+    // When both nearest points resolve to the same vertex, lineAngle returns 0
+    // for the zero-length segment, producing a bogus bearing of 90° that swaps
+    // width/height. Fall back to an axis-aligned bounding box in this case.
+    if (bottomLeftPoint[0] === topLeftPoint[0] && bottomLeftPoint[1] === topLeftPoint[1]) {
+      return new OrthographicBounds([minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY])
+    }
+
     const bearing = lineAngle([bottomLeftPoint as any, topLeftPoint as any]) + 90
     let centroid
     if ( minX == maxX || minY == maxY ) {

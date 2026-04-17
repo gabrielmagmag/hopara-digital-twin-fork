@@ -92,4 +92,25 @@ describe('OrthographicBounds', () => {
       [10, 2.5],
     ))
   })
+
+  it('should not swap dimensions when nearest bottom-left and top-left resolve to the same vertex', () => {
+    const geometry = [
+      [-8.336415319846012, 38.6693323624786],
+      [-5.439742855198681, 40.32278417982161],
+      [-5.029993576060981, 40.059687779285014],
+      [-2.8424050528369875, 41.35143429134041],
+      [-1.0101989297820282, 40.30246678297408],
+      [1.7196515258774099, 41.88984842039645],
+      [12.902808261545378, 35.43100781412795],
+      [4.512337585163305, 31.188085765810683],
+      [-8.336415319846012, 38.6693323624786],
+    ]
+
+    const bounds = OrthographicBounds.fromGeometry(geometry)
+    const width = bounds.getWidth()
+    const height = bounds.getHeight()
+
+    // The polygon is wider than tall (~21 x ~11), so the OBB should preserve that
+    expect(width).toBeGreaterThan(height)
+  })
 })

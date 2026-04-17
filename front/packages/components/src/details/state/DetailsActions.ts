@@ -9,7 +9,7 @@ export const detailsActions = {
   open: createAction('DETAILS_OPEN')<{ layerId: string, row?: Row }>(),
   backClicked: createAction('DETAILS_BACK_CLICKED')<{ layerId: string }>(),
   closeClicked: createAction('DETAILS_CLOSE_CLICKED')<void>(),
-  zoomRequested: createAction('DETAILS_ZOOM_REQUESTED')<{
+  zoomRequested: createAction('ZOOM_REQUESTED')<{
     row?: Row,
     navigate: Navigate,
     coordinates: Coordinates,
