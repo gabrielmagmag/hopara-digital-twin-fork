@@ -7,6 +7,7 @@ import {Logger} from '@hopara/internals'
 import { Row } from '@hopara/dataset'
 import { PositionNormalizer } from '@hopara/projector'
 import { SimpleFetchState } from './fetch/SimpleFetchState'
+import { isNil } from 'lodash'
 
 type RowsetMap = {
   [rowsetId: string]: Rowset
@@ -123,7 +124,7 @@ export class RowsetStore {
   }
 
   getRow(rowsetId: string | undefined, rowId: string | undefined): Row | undefined {
-    if (!rowsetId || !rowId) return undefined
+    if (isNil(rowsetId) || isNil(rowId)) return undefined
 
     const rowset = this.rowsets[rowsetId]    
     return rowset?.getRow(rowId)
