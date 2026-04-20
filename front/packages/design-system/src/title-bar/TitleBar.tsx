@@ -54,6 +54,7 @@ export interface BarButton {
   label?: string;
   responsiveIcon: React.ReactNode;
   tooltip?: string
+  type?: 'button' | 'submit' | 'reset'
 }
 
 interface Props {
@@ -110,6 +111,7 @@ export const TitleBar: React.FunctionComponent<Props> = (props) => {
               data-testid={button.testId}
               disabled={button.disabled}
               onClick={button.onClick}
+              type={button.type}
               color={button.primary ? 'primary' : 'inherit'}
               variant={button.primary ? 'contained' : 'text'}
             >

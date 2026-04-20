@@ -12,7 +12,7 @@ import { usePageNavigation } from '@hopara/page/src/PageNavigation'
 import { LoadingSpinner } from '@hopara/design-system/src/loading-spinner/Spinner'
 import { Sidebar } from '../../sidebar/Sidebar'
 import { Helmet } from 'react-helmet'
-import { TitleBar } from '@hopara/design-system/src/title-bar/TitleBar'
+import { TitleBar, BarButton } from '@hopara/design-system/src/title-bar/TitleBar'
 import { Icon } from '@hopara/design-system/src/icons/Icon'
 import { SidebarLayout } from '@hopara/design-system/src/SidebarLayout'
 import { toastError, toastSuccess } from '@hopara/design-system/src/toast/Toast'
@@ -245,13 +245,14 @@ const EditDataSource = () => {
 
   const savingOrTesting = saving || testing
 
-  const buttons = [{
+  const buttons: BarButton[] = [{
     testId: 'save-button',
     primary: true,
     disabled: saving || testing || !valid,
     onClick: saveButtonClicked,
     label: saving ? i18n('SAVING_ELLIPSIS') : i18n('SAVE'),
     responsiveIcon: <Icon icon="check" />,
+    type: 'submit',
   }]
 
   if (!isFileBased) {
