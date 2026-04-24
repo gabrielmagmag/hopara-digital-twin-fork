@@ -83,7 +83,8 @@ class IsometrifyService:
             tenant=self.tenant,
             library=self.library,
             name=self.name,
-            progress=value
+            progress=value,
+            event='GENERATE_PROGRESS',
         )
 
     def _image_to_fake_render_step(self) -> ResourceStep:

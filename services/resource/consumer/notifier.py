@@ -12,7 +12,7 @@ notification_endpoint = os.getenv('NOTIFICATION_ENDPOINT', 'http://localhost:808
 class Notifier:
     def notify(self, notification: ResourceStepNotification) -> None:
         try:
-            event = notification.get('event', 'GENERATE_PROGRESS')
+            event = notification['event']
             notification_url = f"{notification_endpoint}/notify/{event}"
             headers = {
                 'tenant': notification.get('tenant'),

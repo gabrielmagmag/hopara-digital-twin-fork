@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal, Optional, TypedDict
+from typing import Dict, List, Literal, Optional, Required, TypedDict
 
 from common.crop import CropArea
 from common.resolution import ResolutionType
@@ -57,7 +57,7 @@ class ResourceStepNotification(TypedDict, total=False):
     library: str
     name: str
     progress: float
-    event: str
+    event: Required[str]
 
 
 class RequiredProcessResourceEvent(TypedDict):
