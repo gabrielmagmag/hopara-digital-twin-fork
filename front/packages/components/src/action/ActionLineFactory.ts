@@ -1,5 +1,5 @@
 import {Row} from '@hopara/dataset'
-import {Action, ActionType} from './Action'
+import {Action, ActionType, Trigger} from './Action'
 import {CallbackFunction} from './ActionReducer'
 import { testCondition } from '@hopara/encoding'
 
@@ -19,12 +19,13 @@ const createActionButton = (action: Action, registeredCallbacks: CallbackFunctio
 })
 
 export const createActionButtons = (
-  row: Row | undefined, actions: Action[], registeredCallbacks: CallbackFunction[], onActionClick: (action) => void,
+  row: Row | undefined, actions: Action[], registeredCallbacks: CallbackFunction[], onActionClick: (action: Action) => void,
 ): ActionButton[] => {
   if (!actions?.length) {
     return []
   }
 
-  const availableActions = actions.filter((action) => !action.trigger && testCondition(action.visible?.condition, row, true))
+  const availableActions = actions.filter((action) => (!action.trigger || action.trigger === Trigger.NONE) && 
+                                                       testCondition(action.visible?.condition, row, true))
   return availableActions.map((action) => createActionButton(action, registeredCallbacks, onActionClick))
 }
