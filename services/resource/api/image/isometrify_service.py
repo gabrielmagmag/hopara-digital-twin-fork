@@ -1,25 +1,27 @@
 import io
-from typing import Any
+from abc import ABC, abstractmethod
+from typing import Any, List
 
 from PIL import Image, ImageFilter
 
 from api.image.image_path import ImagePath
 from api.image.image_repository import ImageRepository
 from api.image.message_factory import (
-    create_image_to_shape_step, create_resize_image_to_resolutions_steps)
+    create_image_to_shape_step,
+    create_resize_image_to_resolutions_steps,
+)
 from common.angle import angles
 from common.client.cache import Cache
 from common.client.queue import Queue
 from common.path import path_join
-from common.process_resource_event import (ResourceStep,
-                                           ResourceStepNotification)
+from common.process_resource_event import ResourceStep, ResourceStepNotification
 from common.resolution import Resolution
 from common.resource_path import ResourcePath
 from common.resource_result import ResourceResult
 from common.version import VersionFactory
 
 
-class IsometrifyService:
+class IsometrifyBaseService(ABC):
     old_processed_path: str
     current_version: int
 
@@ -32,6 +34,7 @@ class IsometrifyService:
             tenant: str,
             library: str,
             name: str,
+            destination_library: str | None = None,
             invalidate: bool = True,
     ):
         self.repository = repository
@@ -41,28 +44,22 @@ class IsometrifyService:
         self.library = library
         self.name = name
         self.invalidate = invalidate
+        dest_library = destination_library or library
+        self.dest_library = dest_library
         self.new_version = version_factory.create()
         current_version = self.repository.get_latest_version(tenant, library, name)
 
-        self.cwd = ImagePath.get_base_dir(tenant, library, name)
+        self.source_cwd = ImagePath.get_base_dir(tenant, library, name)
+        self.cwd = ImagePath.get_base_dir(tenant, dest_library, name)
 
         if not current_version:
             raise FileNotFoundError(f'Image {self.name} not found in library {self.library}')
         self.current_version = current_version
 
-        old_processed_path = self.repository.get_higher_resolution_path(self.cwd, self.current_version)
+        old_processed_path = self.repository.get_higher_resolution_path(self.source_cwd, self.current_version)
         if not old_processed_path:
             raise FileNotFoundError(f'Image {self.name} not found in library {self.library}')
         self.old_processed_path = old_processed_path
-
-        self.processed_base_dir = ImagePath.get_base_dir(tenant, library, name)
-
-        self.fake_render_path = 'cache_fake_render.webp'
-
-        self.cache_wf_path = 'cache_wireframe'
-        self.cache_wf_files = [f'{self.cache_wf_path}_{a}.webp' for a in angles]
-
-        self.cache_render_files = [f'cache_render_{a}.webp' for a in angles]
 
         self.processed_fallback_image_file = f'{self.new_version}/{Resolution.default_size()}.webp'
         self.processed_image_files = [f'{self.new_version}/{Resolution.default_size()}_{a}.webp' for a in angles]
@@ -71,79 +68,49 @@ class IsometrifyService:
         self.new_original_fallback_file = f'{self.new_original_path}'
         self.new_original_files = [f'{self.new_original_path}_{a}' for a in angles]
 
-        self.model_path = 'cache_model.glb'
-        self.hint = "" if name.isdigit() else f"This is a '{name}'."
-
         self.progress_image_path = ResourcePath.get_progress_image_path()
-
-        self.lower_res = self.repository.get_lower_resolution_path(self.cwd, self.current_version)
-
-        self.invalidation_urls = [ImagePath.get_invalidation_path(tenant, library, name)] if invalidate else []
+        self.lower_res = self.repository.get_lower_resolution_path(self.source_cwd, self.current_version)
+        self.invalidation_urls = (
+            [ImagePath.get_invalidation_path(tenant, dest_library, name)] if invalidate else []
+        )
 
     def _create_notification(self, value: float) -> ResourceStepNotification:
         return ResourceStepNotification(
             tenant=self.tenant,
-            library=self.library,
+            library=self.dest_library,
             name=self.name,
             progress=value,
             event='GENERATE_PROGRESS',
         )
 
-    def _image_to_fake_render_step(self) -> ResourceStep:
-        return ResourceStep(
-            cwd=self.cwd,
-            type='image_to_fake_render',
-            data={
-                "origin": self.new_original_path,
-                "destination": self.fake_render_path,
-                "hint": self.hint,
-            },
-            use_cache=True,
-            notification=self._create_notification(0.25),
-        )
+    @abstractmethod
+    def _pre_steps(self) -> List[ResourceStep]:
+        """Steps that run once before the per-angle parallel block."""
 
-    def _image_to_model_step(self) -> ResourceStep:
-        return ResourceStep(
-            cwd=self.cwd,
-            type='image_to_model',
-            data={
-                "origin": self.fake_render_path,
-                "destination": self.model_path,
-            },
-            use_cache=True,
-            notification=self._create_notification(0.65),
-        )
+    @abstractmethod
+    def _per_angle_core_step(self, index: int, angle: int) -> ResourceStep:
+        """The step producing the cache image for one angle."""
 
-    def _model_to_image_step(self) -> ResourceStep:
+    @abstractmethod
+    def _core_cache_file(self, index: int) -> str:
+        """The cache file produced by `_per_angle_core_step` for one angle."""
+
+    def _build_parallel(self) -> ResourceStep:
         parallel = ResourceStep(cwd=self.cwd, type='parallel', steps=[])
         parallel_steps = parallel['steps']
         invalidation_urls = self.invalidation_urls + [
-            ImagePath.get_shape_list_invalidation_path(self.tenant, self.library)
+            ImagePath.get_shape_list_invalidation_path(self.tenant, self.dest_library)
         ] if self.invalidate else []
         for index, angle in enumerate(angles):
-            sequential = ResourceStep(
-                cwd=self.cwd,
-                type='sequential',
-                steps=[]
-            )
+            sequential = ResourceStep(cwd=self.cwd, type='sequential', steps=[])
             sequential_steps = sequential['steps']
-            sequential_steps.append(ResourceStep(
-                cwd=self.cwd,
-                type='model_to_image',
-                data={
-                    "origin": self.model_path,
-                    "destinations": [self.cache_render_files[index]],
-                    "angles": [angle],
-                    "resolution": "md",
-                },
-                notification=self._create_notification(0.8),
-                use_cache=True,
-            ))
+            cache_file = self._core_cache_file(index)
+            sequential_steps.append(self._per_angle_core_step(index, angle))
             sequential_steps.append(ResourceStep(
                 cwd=self.cwd,
                 type='copy',
                 data={
-                    "origin": self.cache_render_files[index],
+                    "origin": cache_file,
                     "destinations": [
                         self.new_original_files[index],
                         self.processed_image_files[index]
@@ -185,18 +152,121 @@ class IsometrifyService:
         if self.invalidate:
             self.cache.invalidate(self.invalidation_urls)
 
-        model_to_image = self._model_to_image_step()
+        parallel = self._build_parallel()
         root_payload: ResourceStep = {
             'cwd': self.cwd,
             'type': 'sequential',
-            'steps': [
-                self._image_to_fake_render_step(),
-                self._image_to_model_step(),
-                model_to_image
-            ]
+            'steps': [*self._pre_steps(), parallel]
         }
         self.repository.storage.copy(
             self.old_processed_path, path_join(self.cwd, self.new_original_path)
         )
         self.queue.send_message(root_payload)
-        return self.repository.get(self.tenant, self.library, self.name, self.new_version, 'json')
+        return self.repository.get(self.tenant, self.dest_library, self.name, self.new_version, 'json')
+
+
+class IsometrifyService(IsometrifyBaseService):
+    def __init__(
+            self,
+            repository: ImageRepository,
+            queue: Queue,
+            version_factory: VersionFactory,
+            cache: Cache,
+            tenant: str,
+            library: str,
+            name: str,
+            destination_library: str | None = None,
+            invalidate: bool = True,
+    ):
+        super().__init__(
+            repository, queue, version_factory, cache, tenant, library, name,
+            destination_library=destination_library, invalidate=invalidate,
+        )
+        self.fake_render_path = 'cache_fake_render.webp'
+        self.cache_render_files = [f'cache_render_{a}.webp' for a in angles]
+        self.model_path = 'cache_model.glb'
+        self.hint = "" if name.isdigit() else f"This is a '{name}'."
+
+    def _image_to_fake_render_step(self) -> ResourceStep:
+        return ResourceStep(
+            cwd=self.cwd,
+            type='image_to_fake_render',
+            data={
+                "origin": self.new_original_path,
+                "destination": self.fake_render_path,
+                "hint": self.hint,
+            },
+            use_cache=True,
+            notification=self._create_notification(0.25),
+        )
+
+    def _image_to_model_step(self) -> ResourceStep:
+        return ResourceStep(
+            cwd=self.cwd,
+            type='image_to_model',
+            data={
+                "origin": self.fake_render_path,
+                "destination": self.model_path,
+            },
+            use_cache=True,
+            notification=self._create_notification(0.65),
+        )
+
+    def _pre_steps(self) -> List[ResourceStep]:
+        return [self._image_to_fake_render_step(), self._image_to_model_step()]
+
+    def _core_cache_file(self, index: int) -> str:
+        return self.cache_render_files[index]
+
+    def _per_angle_core_step(self, index: int, angle: int) -> ResourceStep:
+        return ResourceStep(
+            cwd=self.cwd,
+            type='model_to_image',
+            data={
+                "origin": self.model_path,
+                "destinations": [self.cache_render_files[index]],
+                "angles": [angle],
+                "resolution": "md",
+            },
+            notification=self._create_notification(0.8),
+            use_cache=True,
+        )
+
+
+class IsometricTopService(IsometrifyBaseService):
+    def __init__(
+            self,
+            repository: ImageRepository,
+            queue: Queue,
+            version_factory: VersionFactory,
+            cache: Cache,
+            tenant: str,
+            library: str,
+            name: str,
+            destination_library: str | None = None,
+            invalidate: bool = True,
+    ):
+        super().__init__(
+            repository, queue, version_factory, cache, tenant, library, name,
+            destination_library=destination_library, invalidate=invalidate,
+        )
+        self.cache_iso_files = [f'cache_isometric_top_{a}.webp' for a in angles]
+
+    def _pre_steps(self) -> List[ResourceStep]:
+        return []
+
+    def _core_cache_file(self, index: int) -> str:
+        return self.cache_iso_files[index]
+
+    def _per_angle_core_step(self, index: int, angle: int) -> ResourceStep:
+        return ResourceStep(
+            cwd=self.cwd,
+            type='image_to_isometric_top',
+            data={
+                "origin": self.new_original_path,
+                "destinations": [self.cache_iso_files[index]],
+                "angles": [angle],
+            },
+            use_cache=True,
+            notification=self._create_notification(0.5),
+        )

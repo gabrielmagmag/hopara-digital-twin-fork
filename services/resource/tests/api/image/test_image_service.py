@@ -3,12 +3,19 @@ from unittest.mock import MagicMock, call
 
 from api.image.image_path import ImagePath
 from api.image.image_service import ImageService
+from common.angle import angles
 from common.path import path_join
 from common.resolution import ResolutionType
 from common.resource_result import ResourceResult
 from common.resource_state import ResourceState
-from tests.test_utils import (TEST_ROOT, BufferSizeGtValidator, any_library,
-                              any_new_version, any_tenant, any_version)
+from tests.test_utils import (
+    TEST_ROOT,
+    BufferSizeGtValidator,
+    any_library,
+    any_new_version,
+    any_tenant,
+    any_version,
+)
 
 any_name = 'any name'
 any_escaped_name = 'any%20name'
@@ -770,7 +777,120 @@ class TestImageService(unittest.TestCase):
             urls += TestImageService._collect_invalidation_urls(child)
         return urls
 
-        ### END IMAGE TO RENDER ###
+    def test_isometrify_with_destination_library(self):
+        any_dest_library = 'dest_library'
+
+        queue_mock = MagicMock()
+        repository_mock = MagicMock()
+        cache_mock = MagicMock()
+        repository_mock.get_higher_resolution_path.return_value = any_high_resolution_path
+        repository_mock.get_latest_version.return_value = '12345'
+        repository_mock.storage.file_exists.return_value = False
+        repository_mock.get_lower_resolution_path.return_value = path_join(TEST_ROOT, 'fixtures/sample_icon.png')
+        repository_mock.storage.get_bytes.return_value = self.any_png_buffer()
+        repository_mock.get.return_value = ResourceResult.processing()
+
+        service = ImageService(
+            repository_mock, queue_mock, cache_mock, MagicMock(), MagicMock(), MagicMock()
+        )
+        service.version_factory = MagicMock()
+        service.version_factory.create.return_value = any_new_version
+
+        ret = service.image_to_render(any_tenant, any_library, any_name, destination_library=any_dest_library)
+
+        source_cwd = ImagePath.get_base_dir(any_tenant, any_library, any_name)
+        dest_cwd = ImagePath.get_base_dir(any_tenant, any_dest_library, any_name)
+
+        self.assertEqual(ret.state, ResourceState.PROCESSING)
+
+        # Source lookups use source_cwd
+        repository_mock.get_higher_resolution_path.assert_called_once_with(source_cwd, '12345')
+        repository_mock.get_lower_resolution_path.assert_called_once_with(source_cwd, '12345')
+
+        # Progress image written to destination cwd
+        repository_mock.storage.upload.assert_called_once_with(
+            BufferSizeGtValidator(22000), 'progress.webp', cwd=dest_cwd
+        )
+
+        # Raw image copied to destination cwd
+        repository_mock.storage.copy.assert_called_once_with(
+            any_high_resolution_path,
+            f'{dest_cwd}/{any_new_version}/raw'
+        )
+
+        # Final get() uses destination library
+        repository_mock.get.assert_called_once_with(
+            any_tenant, any_dest_library, any_name, any_new_version, 'json'
+        )
+
+        # All queue steps use destination cwd
+        queue_call_args = queue_mock.send_message.call_args[0][0]
+        self.assertEqual(queue_call_args['cwd'], dest_cwd)
+        self.assertEqual(queue_call_args['steps'][0]['cwd'], dest_cwd)
+        self.assertEqual(queue_call_args['steps'][0]['notification']['library'], any_dest_library)
+
+    def test_image_to_render_isometric_method(self):
+        queue_mock = MagicMock()
+        repository_mock = MagicMock()
+        cache_mock = MagicMock()
+        repository_mock.get_higher_resolution_path.return_value = any_high_resolution_path
+        repository_mock.get_latest_version.return_value = '12345'
+        repository_mock.storage.file_exists.return_value = False
+        repository_mock.get_lower_resolution_path.return_value = path_join(TEST_ROOT, 'fixtures/sample_icon.png')
+        repository_mock.storage.get_bytes.return_value = self.any_png_buffer()
+        repository_mock.get.return_value = ResourceResult.processing()
+
+        service = ImageService(
+            repository_mock, queue_mock, cache_mock, MagicMock(), MagicMock(), MagicMock()
+        )
+        service.version_factory = MagicMock()
+        service.version_factory.create.return_value = any_new_version
+
+        ret = service.image_to_render(any_tenant, any_library, any_name, method='isometric-top')
+        self.assertEqual(ret.state, ResourceState.PROCESSING)
+
+        root = queue_mock.send_message.call_args[0][0]
+        # No AI pre-steps: the root sequential is just the per-angle parallel block.
+        self.assertEqual(root['type'], 'sequential')
+        self.assertEqual(len(root['steps']), 1)
+        parallel = root['steps'][0]
+        self.assertEqual(parallel['type'], 'parallel')
+        self.assertEqual(len(parallel['steps']), len(angles))
+
+        all_types = self._collect_types(root)
+        self.assertNotIn('image_to_fake_render', all_types)
+        self.assertNotIn('image_to_model', all_types)
+        self.assertNotIn('model_to_image', all_types)
+
+        for index, angle in enumerate(angles):
+            sequential = parallel['steps'][index]
+            core = sequential['steps'][0]
+            self.assertEqual(core['type'], 'image_to_isometric_top')
+            self.assertEqual(core['data']['origin'], f'{any_new_version}/raw')
+            self.assertEqual(core['data']['destinations'], [f'cache_isometric_top_{angle}.webp'])
+            self.assertEqual(core['data']['angles'], [angle])
+
+            copy_step = sequential['steps'][1]
+            self.assertEqual(copy_step['type'], 'copy')
+            self.assertEqual(copy_step['data']['origin'], f'cache_isometric_top_{angle}.webp')
+            self.assertEqual(copy_step['data']['destinations'], [
+                f'{any_new_version}/raw_{angle}',
+                f'{any_new_version}/4096_{angle}.webp',
+            ])
+
+            post = sequential['steps'][2]
+            post_types = [s['type'] for s in post['steps']]
+            self.assertIn('image_to_shape', post_types)
+            self.assertIn('image_resize', post_types)
+
+    @staticmethod
+    def _collect_types(step):
+        types = [step['type']]
+        for child in step.get('steps', []):
+            types += TestImageService._collect_types(child)
+        return types
+
+    ### END IMAGE TO RENDER ###
 
     ### GET ###
 

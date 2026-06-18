@@ -19,6 +19,9 @@ from consumer.image.dimensions import get_width_and_height
 
 Image.MAX_IMAGE_PIXELS = 300000000
 
+# WebP cannot encode an image whose width or height exceeds 16383 px.
+MAX_WEBP_DIMENSION = 16383
+
 x = Decimal('1.0')  # For compatibility with Python 3.6 and earlier
 
 
@@ -119,14 +122,26 @@ def process_image(
             return convert_to_webp(output_file.read())
 
 
-def convert_to_webp(input: bytes) -> Tuple[bytes, int, int]:
-    bbb = io.BytesIO(input)
-    img = Image.open(bbb)
+def _fit_within_webp_limit(img: Image.Image) -> Image.Image:
+    scale = min(1.0, MAX_WEBP_DIMENSION / img.width, MAX_WEBP_DIMENSION / img.height)
+    if scale < 1.0:
+        img = img.resize(
+            (max(1, int(img.width * scale)), max(1, int(img.height * scale))),
+            Image.Resampling.LANCZOS,
+        )
+    return img
+
+
+def encode_webp(img: Image.Image, quality: int = 75, optimize: bool = True) -> Tuple[bytes, int, int]:
+    img = _fit_within_webp_limit(img)
     buffer = io.BytesIO()
-    img.save(buffer, 'WEBP', optimize=True, quality=75)
-    width = img.size[0]
-    height = img.size[1]
-    return buffer.getvalue(), width, height
+    img.save(buffer, 'WEBP', optimize=optimize, quality=quality)
+    return buffer.getvalue(), img.width, img.height
+
+
+def convert_to_webp(input: bytes) -> Tuple[bytes, int, int]:
+    img = Image.open(io.BytesIO(input))
+    return encode_webp(img, quality=75, optimize=True)
 
 
 def convert_to_png(input: bytes) -> bytes:
