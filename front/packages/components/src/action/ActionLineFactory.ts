@@ -25,7 +25,7 @@ export const createActionButtons = (
     return []
   }
 
-  const availableActions = actions.filter((action) => (!action.trigger || action.trigger == Trigger.NONE) && 
+  const availableActions = actions.filter((action) => (!action.trigger || action.trigger === Trigger.NONE) && 
                                                        testCondition(action.visible?.condition, row, true))
   return availableActions.map((action) => createActionButton(action, registeredCallbacks, onActionClick))
 }
