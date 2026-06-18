@@ -41,6 +41,7 @@ ResourceStepType = Literal[
     'image_crop',
     "image_resize",
     'image_to_fake_render',
+    'image_to_isometric_top',
     'image_to_model',
     "image_to_rooms",
     "image_to_shape",

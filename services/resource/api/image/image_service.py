@@ -5,11 +5,13 @@ from api.image.image import ImageRequestFormat
 from api.image.image_path import ImagePath
 from api.image.image_repository import ImageRepository
 from api.image.image_shape_repository import ImageShapeRepository
-from api.image.isometrify_service import IsometrifyService
+from api.image.isometrify_service import IsometricTopService, IsometrifyService
 from api.image.message_factory import (
-    create_crop_image_step, create_image_to_polygon_messages,
+    create_crop_image_step,
+    create_image_to_polygon_messages,
     create_resize_image_to_default_size_message,
-    create_resize_image_to_resolutions_steps)
+    create_resize_image_to_resolutions_steps,
+)
 from api.resource.resource_history_repository import ResourceHistoryRepository
 from api.resource.resource_process_client import ResourceProcessClient
 from common.angle import angles
@@ -243,10 +245,13 @@ class ImageService:
         return shapes
 
     def image_to_render(
-            self, tenant: str, library: str, name: str, invalidate: bool = True
+            self, tenant: str, library: str, name: str,
+            destination_library: str | None = None, method: str = 'ai',
+            invalidate: bool = True,
     ) -> ResourceResult:
-        isometrify_service = IsometrifyService(
+        service_cls = IsometricTopService if method == 'isometric-top' else IsometrifyService
+        service = service_cls(
             self.repository, self.queue, self.version_factory, self.cache, tenant, library, name,
-            invalidate=invalidate,
+            destination_library=destination_library, invalidate=invalidate,
         )
-        return isometrify_service.process()
+        return service.process()
