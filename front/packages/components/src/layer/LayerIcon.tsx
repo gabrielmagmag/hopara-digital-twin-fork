@@ -24,7 +24,7 @@ export function getIcon(layer: Layer, row?: Row) {
   }
 
   if (layer.hasRenderChildren()) {
-    const iconLayer = layer.getRenderLayers().find((child) => child.isType(LayerType.icon) && (row || child.encoding.icon?.value))
+    const iconLayer = layer.getRenderLayers().reverse().find((child) => child.isType(LayerType.icon) && (row || child.encoding.icon?.value))
     if (iconLayer) return getIcon(iconLayer, row)
   }
 
