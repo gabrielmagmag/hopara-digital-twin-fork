@@ -1,4 +1,4 @@
-import { Row } from '@hopara/dataset'
+import { geti, isFieldTemplate, resolveTemplate, Row } from '@hopara/dataset'
 import { BaseEncoding } from './BaseEncoding'
 import { isNil } from 'lodash'
 
@@ -12,8 +12,15 @@ export abstract class ResourceEncoding<T> extends BaseEncoding<T> {
       return undefined
     }
 
-    if (row && encoding.field && !isNil(row[encoding.field])) {
-      return row[encoding.field].toString()
+    if (row && encoding.field ) {
+      if ( isFieldTemplate(encoding.field) ) {
+        return resolveTemplate(encoding.field, row)
+      }
+
+      const fieldValue = geti(encoding.field, row)
+      if ( !isNil(fieldValue) ) {
+        return fieldValue.toString()
+      }
     }
 
     return encoding.value

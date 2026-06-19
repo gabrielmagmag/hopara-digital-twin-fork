@@ -30,6 +30,7 @@ export {EditableFeatureRowTranslator} from './row/translator/EditableFeatureRowT
 export {SCOPE_COLUMN_NAME, createScopeFilter} from './row/Scope'
 export {createIndexedRowsById, IndexedRows} from './row/IndexedRows'
 export {queryKeyToArray} from './query/Queries'
+export {isFieldTemplate, resolveTemplate} from './row/FieldTemplate'
 
 export const INTERNAL_DATA_SOURCE = 'hopara'
 export const SAMPLE_DATA_SOURCE = 'sample'
