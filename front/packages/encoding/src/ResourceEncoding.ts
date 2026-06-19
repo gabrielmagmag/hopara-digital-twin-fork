@@ -17,8 +17,9 @@ export abstract class ResourceEncoding<T> extends BaseEncoding<T> {
         return resolveTemplate(encoding.field, row)
       }
 
-      if ( !isNil(row[encoding.field]) ) {
-        return geti(encoding.field, row).toString()
+      const fieldValue = geti(encoding.field, row)
+      if ( !isNil(fieldValue) ) {
+        return fieldValue.toString()
       }
     }
 
