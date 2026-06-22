@@ -290,6 +290,24 @@ class TestSystemImage(unittest.TestCase):
         self.assertGreater(len(original_bytes), 0)
         self.assertGreater(len(processed_bytes), 0)
 
+    @inject
+    def test_get_serves_global_image(self, storage: Storage = Provide[Container.storage]):
+        random_file_name = get_random_name()
+        # Seed a pre-processed image in the GLOBAL namespace (image/hopara/<lib>/<name>/<version>/md.webp).
+        global_cwd = ImagePath.get_base_dir('', 'lab', random_file_name)
+        storage.upload(
+            self.get_file_buffer(self.png_path),
+            ImagePath.get_resolution_path(any_version, 'md'),
+            cwd=global_cwd,
+        )
+
+        # Request it under a tenant library that does NOT contain it.
+        url = f'{self.host}/image-library/{any_library}/image/{random_file_name}'
+        response = self.test_app.get(url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(self.get_file_buffer(self.png_path), response.data)
+
     @patch('requests.Session.put', new=mock_put)
     def test_put_and_get_processing_resolution(self):
         random_file_name = get_random_name()
