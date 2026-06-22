@@ -1,4 +1,5 @@
 import json
+import os
 from typing import List, Optional
 
 from api.image.image import ImageRequestFormat
@@ -124,13 +125,14 @@ class ImageRepository:
 
     def _list_global_libraries(self) -> List[str]:
         general_dir = 'image/hopara/'
-        libraries: List[str] = []
-        for folder in self.storage.enum_folders(general_dir):
-            relative = folder.replace(general_dir, '')
-            items = relative.split('/')
-            if items and items[0] and items[0] not in libraries:
-                libraries.append(items[0])
-        return sorted(libraries)
+        # fast_mode lists only the top-level library folders (S3 CommonPrefixes / one
+        # listdir level) instead of enumerating every object under the prefix.
+        folders = self.storage.enum_folders(general_dir, fast_mode=True)
+        return sorted({
+            os.path.basename(folder.rstrip('/'))
+            for folder in folders
+            if folder.rstrip('/')
+        })
 
     def get_from_global(
             self, name: str, format: ImageRequestFormat,
