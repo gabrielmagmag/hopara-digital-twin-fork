@@ -1,4 +1,5 @@
 import json
+import os
 from typing import List, Optional
 
 from api.image.image import ImageRequestFormat
@@ -120,6 +121,28 @@ class ImageRepository:
                     }
                 }).encode())
             return ResourceResult.processing(buffer)
+        return ResourceResult.not_found()
+
+    def _list_global_libraries(self) -> List[str]:
+        general_dir = 'image/hopara/'
+        # fast_mode lists only the top-level library folders (S3 CommonPrefixes / one
+        # listdir level) instead of enumerating every object under the prefix.
+        folders = self.storage.enum_folders(general_dir, fast_mode=True)
+        return sorted({
+            os.path.basename(folder.rstrip('/'))
+            for folder in folders
+            if folder.rstrip('/')
+        })
+
+    def get_from_global(
+            self, name: str, format: ImageRequestFormat,
+            resolution: Optional[ResolutionType] = None, max_size: Optional[int] = None,
+            angle: Optional[int] = None,
+    ) -> ResourceResult:
+        for library in self._list_global_libraries():
+            version = self.get_latest_version('', library, name)
+            if version:
+                return self.get('', library, name, version, format, resolution, max_size, angle)
         return ResourceResult.not_found()
 
     def get_higher_resolution_path(self, cwd: str, version: int) -> Optional[str]:

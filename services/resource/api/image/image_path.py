@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import quote
 
 from common.resolution import Resolution, ResolutionType
 from common.resource_path import ResourcePath
@@ -22,6 +23,8 @@ class ImagePath:
 
     @staticmethod
     def get_base_dir(tenant: str, library: str, name: str) -> str:
+        if not tenant:
+            return f'image/hopara/{library}/{quote(name, "")}'
         return ResourcePath.get_base_dir(image_type, tenant, library, name)
 
     @staticmethod

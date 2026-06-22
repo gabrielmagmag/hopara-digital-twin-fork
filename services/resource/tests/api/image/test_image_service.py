@@ -919,6 +919,7 @@ class TestImageService(unittest.TestCase):
 
         not_found_result = ResourceResult.not_found()
         repository_mock.get.return_value = not_found_result
+        repository_mock.get_from_global.return_value = ResourceResult.not_found()
 
         service = ImageService(repository_mock, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
 
@@ -964,6 +965,7 @@ class TestImageService(unittest.TestCase):
         # Both calls return not found
         not_found_result = ResourceResult.not_found()
         repository_mock.get.return_value = not_found_result
+        repository_mock.get_from_global.return_value = ResourceResult.not_found()
 
         service = ImageService(repository_mock, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
 
@@ -997,6 +999,25 @@ class TestImageService(unittest.TestCase):
         )
         self.assertEqual(result, processing_result)
         self.assertEqual(result.state, ResourceState.PROCESSING)
+
+    def test_get_serves_global_when_tenant_missing(self):
+        repository_mock = MagicMock()
+        repository_mock.get_latest_version.return_value = None
+
+        global_result = ResourceResult.success(MagicMock(), {'library': 'lab'})
+        repository_mock.get_from_global.return_value = global_result
+
+        service = ImageService(repository_mock, MagicMock(), MagicMock(), MagicMock(), MagicMock(), MagicMock())
+
+        result = service.get(any_tenant, any_library, any_name, 'image', any_resolution, any_max_size)
+
+        repository_mock.get_latest_version.assert_called_once_with(any_tenant, any_library, any_name)
+        repository_mock.get.assert_not_called()
+        repository_mock.get_from_global.assert_called_once_with(
+            any_name, 'image', any_resolution, any_max_size, None
+        )
+        self.assertEqual(result, global_result)
+        self.assertEqual(result.state, ResourceState.SUCCESS)
 
     ### END GET ###
 

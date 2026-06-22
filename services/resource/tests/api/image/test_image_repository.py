@@ -231,3 +231,31 @@ class TestImageRepository(unittest.TestCase):
         self.assertIsNone(buffer)
 
     ### END GET BEST RESOLUTION FILE ###
+
+    ### GET FROM GLOBAL ###
+    def test_get_from_global_not_found(self):
+        result = self.repository.get_from_global('missing', 'image')
+        self.assertEqual(result.state, ResourceState.NOT_FOUND)
+
+    def test_get_from_global_found_in_library(self):
+        global_cwd = ImagePath.get_base_dir('', 'lab', any_name)
+        self.storage.upload(b'4096', ImagePath.get_resolution_path(any_version, 'md'), {'width': 10}, cwd=global_cwd)
+
+        result = self.repository.get_from_global(any_name, 'image')
+
+        self.assertEqual(result.state, ResourceState.SUCCESS)
+        self.assertEqual(result.buffer, b'4096')
+        self.assertEqual(result.metadata['library'], 'lab')
+
+    def test_get_from_global_is_deterministic_across_libraries(self):
+        # Same name in two global libraries: alphabetically-first ('a-lib') must win over 'b-lib'.
+        a_cwd = ImagePath.get_base_dir('', 'a-lib', any_name)
+        b_cwd = ImagePath.get_base_dir('', 'b-lib', any_name)
+        self.storage.upload(b'from-a', ImagePath.get_resolution_path(any_version, 'md'), cwd=a_cwd)
+        self.storage.upload(b'from-b', ImagePath.get_resolution_path(any_version, 'md'), cwd=b_cwd)
+
+        result = self.repository.get_from_global(any_name, 'image')
+
+        self.assertEqual(result.state, ResourceState.SUCCESS)
+        self.assertEqual(result.buffer, b'from-a')
+        self.assertEqual(result.metadata['library'], 'a-lib')
