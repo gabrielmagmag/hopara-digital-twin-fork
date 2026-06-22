@@ -200,7 +200,7 @@ class ImageService:
             version = self.repository.get_latest_version(tenant, library, fallback)
             if version:
                 return self.repository.get(tenant, library, fallback, version, format, resolution, max_size, angle)
-        return ResourceResult.not_found()
+        return self.repository.get_from_global(name, format, resolution, max_size, angle)
 
     def history_list(self, tenant: str, library: str, name: str, limit: int | None) -> List[Dict[str, Any]]:
         return self.history_repository.list(tenant, library, name, limit)
