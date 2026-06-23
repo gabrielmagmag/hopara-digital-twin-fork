@@ -147,6 +147,25 @@ class TestImageRepository(unittest.TestCase):
             path, f'image/customers/{any_tenant}/{any_library}/{any_name}/{any_version}/8192.webp'
         )
 
+    def test_get_higher_resolution_path_falls_back_to_raw_when_only_angled(self):
+        # A generate-produced version only has angle-suffixed resolution files
+        # plus a raw file (no plain `<size>.webp`).
+        for angle in angles:
+            self.storage.upload(b'angled', ImagePath.get_resolution_path(any_version, 'md', angle), cwd=cwd)
+        self.storage.upload(b'raw-source', ImagePath.get_raw_file_path(any_version), cwd=cwd)
+        path = self.repository.get_higher_resolution_path(cwd, any_version)
+        self.assertEqual(
+            path, f'image/customers/{any_tenant}/{any_library}/{any_name}/{any_version}/raw'
+        )
+
+    def test_get_higher_resolution_path_prefers_plain_over_raw(self):
+        self.storage.upload(b'4096', ImagePath.get_resolution_path(any_version, 'md'), cwd=cwd)
+        self.storage.upload(b'raw-source', ImagePath.get_raw_file_path(any_version), cwd=cwd)
+        path = self.repository.get_higher_resolution_path(cwd, any_version)
+        self.assertEqual(
+            path, f'image/customers/{any_tenant}/{any_library}/{any_name}/{any_version}/4096.webp'
+        )
+
     ### END GET HIGHER RESOLUTION PATH ###
 
     ## GET HIGHER RESOLUTION PATH ##
