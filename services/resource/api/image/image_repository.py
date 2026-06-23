@@ -150,6 +150,12 @@ class ImageRepository:
             path = f'{cwd}/{ImagePath.get_resolution_path(version, resolution)}'
             if self.storage.file_exists(path):
                 return path
+        # Generate (isometrify) output versions only contain angle-suffixed
+        # resolution files; the un-rotated source image is preserved as `raw`,
+        # which is the correct input for re-generating from such a version.
+        raw_path = f'{cwd}/{ImagePath.get_raw_file_path(version)}'
+        if self.storage.file_exists(raw_path):
+            return raw_path
         return None
 
     def get_lower_resolution_path(self, cwd: str, version: int) -> Optional[str]:
