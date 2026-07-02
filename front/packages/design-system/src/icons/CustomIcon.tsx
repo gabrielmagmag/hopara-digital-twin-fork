@@ -90,6 +90,7 @@ import { ReactComponent as UserLocation } from './custom-icons/user-location.svg
 import { ReactComponent as UserLocationActive } from './custom-icons/user-location-active.svg'
 import { ReactComponent as PDF } from './custom-icons/pdf.svg'
 import { ReactComponent as GenerateIsometric } from './custom-icons/generate-isometric.svg'
+import { ReactComponent as ProjectToIsometric } from './custom-icons/project-to-isometric.svg'
 import { ReactComponent as ChevronExpand } from './custom-icons/chevron-expand.svg'
 import { ReactComponent as ChevronClose } from './custom-icons/chevron-close.svg'
 import { ReactComponent as RotateLeft } from './custom-icons/rotate-left.svg'
@@ -193,6 +194,7 @@ export const customIcons = {
   'user-location-active': UserLocationActive,
   'pdf': PDF,
   'generate-isometric': GenerateIsometric,
+  'project-to-isometric': ProjectToIsometric,
   'chevron-expand': ChevronExpand,
   'chevron-close': ChevronClose,
   'rotate-left': RotateLeft,

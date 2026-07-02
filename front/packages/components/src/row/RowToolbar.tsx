@@ -363,7 +363,7 @@ export class RowToolbar extends PureComponent<StateProps & ActionProps, {
                   onClick={this.props.onGenerateIsometricClick}
                 />}
                 {!this.props.allowRotation && this.props.allowImageEdit && this.props.generatingMethod !== IsometricMethod.REALISTIC && <CanvasNavigationButton
-                  icon={this.props.generatingMethod === IsometricMethod.ISOMETRIC_TOP ? 'progress-activity' : 'generate-isometric'}
+                  icon={this.props.generatingMethod === IsometricMethod.ISOMETRIC_TOP ? 'progress-activity' : 'project-to-isometric'}
                   label={!cloudFeaturesEnabled
                     ? <CloudFeatureLabel featureName={i18n('PROJECT_TO_ISOMETRIC')}/>
                     : i18n('PROJECT_TO_ISOMETRIC')}
