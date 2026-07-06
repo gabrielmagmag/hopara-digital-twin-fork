@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.hopara.app/app/0.57",
+  "$schema": "https://schema.hopara.app/app/0.59",
   "id": "process",
   "name": "Process",
   "type": "WHITEBOARD",
@@ -7,6 +7,8 @@
   "group": "SAMPLE",
   "actions": [],
   "scope": "WHITEBOARD",
+  "animationFps": 24,
+  "bleedFactor": 8,
   "legends": [],
   "layers": [
     {
@@ -95,7 +97,12 @@
         },
         "image": {
           "field": "image_name",
-          "scope": "hopara"
+          "scope": "hopara",
+          "view": {
+            "value": "45",
+            "field": "hopara_view"
+          },
+          "resolution": "md"
         }
       },
       "id": "c793acaa-0368-4676-8dc9-b3c9b8f5a262",
@@ -436,6 +443,7 @@
             },
             "size": {
               "value": 46.25028612296957,
+              "referenceZoom": 4.5,
               "animation": {
                 "channel": {
                   "duration": 1500,
@@ -458,8 +466,7 @@
                     "field": "alert"
                   }
                 }
-              },
-              "referenceZoom": 4.5
+              }
             },
             "animation": {
               "type": "ripple",
@@ -523,6 +530,7 @@
             },
             "size": {
               "value": 41.223081109603314,
+              "referenceZoom": 4.5,
               "animation": {
                 "channel": {
                   "duration": 1500,
@@ -545,8 +553,7 @@
                     "field": "alert"
                   }
                 }
-              },
-              "referenceZoom": 4.5
+              }
             },
             "animation": {
               "type": "pulse",
@@ -953,5 +960,6 @@
     "x": "SCALE",
     "y": "SCALE"
   },
-  "floors": []
+  "floors": [],
+  "grids": []
 }
