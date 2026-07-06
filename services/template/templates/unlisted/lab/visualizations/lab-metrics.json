@@ -1,5 +1,5 @@
 {
-  "$schema": "https://schema.hopara.app/app/0.57",
+  "$schema": "https://schema.hopara.app/app/0.59",
   "id": "lab-metrics",
   "name": "Metric History",
   "type": "CHART",
@@ -7,6 +7,8 @@
   "group": "SAMPLE",
   "actions": [],
   "scope": "CHART",
+  "animationFps": 24,
+  "bleedFactor": 8,
   "legends": [],
   "layers": [
     {
@@ -98,7 +100,8 @@
       "encoding": {
         "color": {
           "scale": {
-            "scheme": "redyellowgreen"
+            "scheme": "redyellowgreen",
+            "reverse": false
           },
           "opacity": 1,
           "value": "#4c78a8"
@@ -154,11 +157,48 @@
                 }
               }
             }
+          },
+          {
+            "title": "Timestamp",
+            "visible": true,
+            "value": {
+              "encoding": {
+                "text": {
+                  "field": "timestamp"
+                }
+              }
+            },
+            "primaryKey": false
+          },
+          {
+            "title": "Room id",
+            "visible": true,
+            "value": {
+              "encoding": {
+                "text": {
+                  "field": "room_id"
+                }
+              }
+            },
+            "primaryKey": false
+          },
+          {
+            "title": "Asset id",
+            "visible": true,
+            "value": {
+              "encoding": {
+                "text": {
+                  "field": "asset_id"
+                }
+              }
+            },
+            "primaryKey": false
           }
         ],
         "tooltip": true
       },
       "actions": [],
+      "helperText": "You can zoom in to see the individual measurements",
       "visible": {
         "value": true,
         "zoomRange": {
@@ -724,5 +764,7 @@
   "zoomBehavior": {
     "x": "SCALE",
     "y": "FIXED"
-  }
+  },
+  "floors": [],
+  "grids": []
 }
