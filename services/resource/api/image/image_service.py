@@ -5,11 +5,13 @@ from api.image.image import ImageRequestFormat
 from api.image.image_path import ImagePath
 from api.image.image_repository import ImageRepository
 from api.image.image_shape_repository import ImageShapeRepository
-from api.image.isometrify_service import IsometrifyService
+from api.image.isometrify_service import IsometricTopService, IsometrifyService
 from api.image.message_factory import (
-    create_crop_image_step, create_image_to_polygon_messages,
+    create_crop_image_step,
+    create_image_to_polygon_messages,
     create_resize_image_to_default_size_message,
-    create_resize_image_to_resolutions_steps)
+    create_resize_image_to_resolutions_steps,
+)
 from api.resource.resource_history_repository import ResourceHistoryRepository
 from api.resource.resource_process_client import ResourceProcessClient
 from common.angle import angles
@@ -198,7 +200,7 @@ class ImageService:
             version = self.repository.get_latest_version(tenant, library, fallback)
             if version:
                 return self.repository.get(tenant, library, fallback, version, format, resolution, max_size, angle)
-        return ResourceResult.not_found()
+        return self.repository.get_from_global(name, format, resolution, max_size, angle)
 
     def history_list(self, tenant: str, library: str, name: str, limit: int | None) -> List[Dict[str, Any]]:
         return self.history_repository.list(tenant, library, name, limit)
@@ -242,8 +244,14 @@ class ImageService:
             shapes.setdefault(result.metadata['name'], []).append(result.metadata)
         return shapes
 
-    def image_to_render(self, tenant: str, library: str, name: str) -> ResourceResult:
-        isometrify_service = IsometrifyService(
-            self.repository, self.queue, self.version_factory, self.cache, tenant, library, name
+    def image_to_render(
+            self, tenant: str, library: str, name: str,
+            destination_library: str | None = None, method: str = 'ai',
+            invalidate: bool = True,
+    ) -> ResourceResult:
+        service_cls = IsometricTopService if method == 'isometric-top' else IsometrifyService
+        service = service_cls(
+            self.repository, self.queue, self.version_factory, self.cache, tenant, library, name,
+            destination_library=destination_library, invalidate=invalidate,
         )
-        return isometrify_service.process()
+        return service.process()
