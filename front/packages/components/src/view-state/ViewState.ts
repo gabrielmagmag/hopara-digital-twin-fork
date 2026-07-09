@@ -92,6 +92,7 @@ class ViewState {
   zoomBehavior: ZoomBehavior
   rotationOrbit?: number
   rotationX?: number
+  viewRotationOffset?: number
   dimensions: Dimensions
   viewport: OrbitViewport | WebMercatorViewport | OrthographicViewport
   zoomBackPosition?: Position
@@ -506,6 +507,10 @@ class ViewState {
     if (!this.zoomBackPosition) return this
     const cloned = this.clone({zoomBackPosition: undefined})
     return cloned.transition(this.zoomBackPosition, true)
+  }
+
+  setViewRotationOffset(offset: number): ViewState {
+    return this.clone({viewRotationOffset: offset})
   }
 
   setAutoRotate(autoRotate: boolean): ViewState {

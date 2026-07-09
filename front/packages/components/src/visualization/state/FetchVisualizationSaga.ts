@@ -57,6 +57,7 @@ const getViewState = (
     coordinates: isNil(params?.coordinates) ? initialViewState.coordinates : new Coordinates(params?.coordinates),
     rotationOrbit: initialViewState?.position?.rotationOrbit ?? params?.rotationOrbit,
     rotationX: initialViewState?.position?.rotationX ?? params?.rotationX,
+    viewRotationOffset: params?.viewRotationOffset,
     zoomBehavior: initialViewState.zoomBehavior,
     dimensions: getViewDimension(),
     center: getCenterOfTheWorldCoordinates(world, getViewDimension()),

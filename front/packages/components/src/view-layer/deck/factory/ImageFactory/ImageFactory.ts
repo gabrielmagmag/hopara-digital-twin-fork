@@ -11,6 +11,7 @@ import {EditableImageFactory} from '../EditableFactory/EditableImageFactory'
 import {ViewLayerEditingMode} from '../../../ViewLayerStore'
 import {isNil} from 'lodash/fp'
 import {ImageFetch} from '@hopara/resource'
+import {ImageRotation} from '../../../../image/ImageRotation'
 import { ImageLoader } from './ImageLoader'
 import GL from '@luma.gl/constants'
 import ViewState from '../../../../view-state/ViewState'
@@ -75,11 +76,13 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
 
     for (const row of props.rows) {
       const lastModified = this.getLastModified(props, row)
+      const rotation = new ImageRotation(Number(props.encoding.image?.getView(row)))
+      const view = rotation.getAngleWithOffset(props.viewState.viewRotationOffset)
       const image = new Image({
         id: props.encoding.image?.getId(row),
         fallback: props.encoding.image?.getFallback(row),
         library: props.encoding.image?.scope,
-        view: props.encoding.image?.getView(row),
+        view: String(view),
         resolution: props.encoding.image?.resolution,
         tenant: props.resource.authorization.tenant,
         version: lastModified,
@@ -98,7 +101,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
   getDownloadProgressCallback(props: DeckLayerProps, imageId: string) {
     const bitmapManager = this.bitmapManagers[imageId]
     if ( !bitmapManager ) return props.resource.onResourceDownloadProgressChange
-  }
+  } 
 
   getAbortController(props: DeckLayerProps, imageId: string) {
     return () => {
@@ -148,11 +151,13 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
     const id = `${props.id}-${selectedRow._id}`
     const bounds = this.getBounds(props, selectedRow, props.encoding?.position!.coordinates)
     const lastModified = this.getLastModified(props, selectedRow)
+    const rotation = new ImageRotation(Number(props.encoding.image?.getView(selectedRow)))
+    const view = rotation.getAngleWithOffset(props.viewState.viewRotationOffset)
     const imageFetchUrl = new ImageFetch().getUrl({
       id: props.encoding.image?.getId(selectedRow),
       fallback: props.encoding.image?.getFallback(selectedRow),
       library: props.encoding.image?.scope,
-      view: props.encoding.image?.getView(selectedRow),
+      view: String(view),
       tenant: props.resource.authorization.tenant,
       version: lastModified,
       webGLMaxTextureSize: props.resource.maxTextureSize,

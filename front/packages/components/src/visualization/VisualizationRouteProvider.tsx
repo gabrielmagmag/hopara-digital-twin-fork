@@ -31,6 +31,7 @@ export type VisualizationRouteParams = {
   bearing?: number
   rotationX?: number
   rotationOrbit?: number
+  viewRotationOffset?: number
   version?: number
   initialRow?: InitialRow
   floor?: Floor
@@ -45,6 +46,7 @@ interface RouteProps {
   bearing?: number
   rotationX?: number
   rotationOrbit?: number
+  viewRotationOffset?: number
   filter?: string | string[]
   fallbackVisualizationId?: string
   visualizationScope?: string
@@ -131,6 +133,10 @@ const urlRotationOrbit = (urlParams: any): number | undefined => {
   return Number.isNaN(toNumber(urlParams.rotationOrbit)) ? undefined : toNumber(urlParams.rotationOrbit)
 }
 
+const urlViewRotationOffset = (urlParams: any): number | undefined => {
+  return Number.isNaN(toNumber(urlParams.viewRotationOffset)) ? undefined : toNumber(urlParams.viewRotationOffset)
+}
+
 const urlInitialRow = (urlParams: any): InitialRow | undefined => {
   if (isNil(urlParams.initialLayerId) || isNil(urlParams.initialRowId)) return undefined
   return {layerId: urlParams.initialLayerId, rowId: urlParams.initialRowId}
@@ -152,6 +158,7 @@ const queryParamsToRouteParams = (queryParams: any): VisualizationRouteParams =>
     bearing: urlBearing(queryParams),
     rotationX: urlRotationX(queryParams),
     rotationOrbit: urlRotationOrbit(queryParams),
+    viewRotationOffset: urlViewRotationOffset(queryParams),
     initialRow: urlInitialRow(queryParams),
   }
 }
@@ -173,6 +180,7 @@ const isEmptyParams = (params: VisualizationRouteParams): boolean => {
          isNil(params.zoom) &&
          isNil(params.rotationX) &&
          isNil(params.rotationOrbit) &&
+         isNil(params.viewRotationOffset) &&
          isNil(params.initialRow)
 }
 
@@ -209,6 +217,7 @@ export const createRouteParams = (
     bearing: isNumber(viewState?.bearing) ? viewState.bearing : undefined,
     rotationX: isNumber(viewState?.rotationX) ? viewState.rotationX : undefined,
     rotationOrbit: isNumber(viewState?.rotationOrbit) ? viewState.rotationOrbit : undefined,
+    viewRotationOffset: viewState?.viewRotationOffset ? viewState.viewRotationOffset : undefined,
     filter: getFilterParam(selectedFilters),
     fallbackVisualizationId,
     visualizationScope,
