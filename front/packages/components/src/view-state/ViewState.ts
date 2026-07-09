@@ -92,7 +92,7 @@ class ViewState {
   zoomBehavior: ZoomBehavior
   rotationOrbit?: number
   rotationX?: number
-  viewRotationOffset?: number
+  rotationOffset?: number
   dimensions: Dimensions
   viewport: OrbitViewport | WebMercatorViewport | OrthographicViewport
   zoomBackPosition?: Position
@@ -125,7 +125,6 @@ class ViewState {
   getRawCoordinates(): Coordinates | undefined {
     return this.coordinates
   }
-
 
   getCoordinateState(): { x: number, y: number, longitude?: number, latitude?: number, target: number[] } {
     const coordinates = !this.coordinates ? (this.initialPosition?.getCoordinates() ?? this.center ?? new Coordinates()) : this.coordinates
@@ -258,6 +257,7 @@ class ViewState {
       centerCoordinates: this.center,
       height: this.getDimensions()?.height,
       width: this.getDimensions()?.width,
+      rotationOffset: this.rotationOffset,
     }
   }
 
@@ -509,8 +509,8 @@ class ViewState {
     return cloned.transition(this.zoomBackPosition, true)
   }
 
-  setViewRotationOffset(offset: number): ViewState {
-    return this.clone({viewRotationOffset: offset})
+  setRotationOffset(offset: number): ViewState {
+    return this.clone({ rotationOffset: offset })
   }
 
   setAutoRotate(autoRotate: boolean): ViewState {

@@ -63,8 +63,10 @@ export const limitTarget = (target, width, height, zoom, axesDimensions?: AxesDi
 
   return target
 }
-export const getViewMatrix = ({scale, flipY}: {scale:number, flipY: boolean}) => {
-  return viewMatrix.clone().scale([scale, scale * (flipY ? -1 : 1), scale])
+export const getViewMatrix = ({scale, flipY, rotation = 0}: {scale: number, flipY: boolean, rotation?: number}) => {
+  const mat = viewMatrix.clone().scale([scale, scale * (flipY ? -1 : 1), scale])
+  if (rotation) mat.rotateZ(rotation * Math.PI / 180)
+  return mat
 }
 
 export const getZoomX = (zoom, fixed: boolean) : number => {

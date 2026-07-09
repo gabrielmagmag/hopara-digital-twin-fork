@@ -5,7 +5,6 @@ import { i18n } from '@hopara/i18n'
 import { PureComponent } from '@hopara/design-system'
 
 export interface StateProps {
-  canRotate: boolean
 }
 
 export interface ActionProps {
@@ -17,10 +16,9 @@ export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
     return (
       <CanvasNavigationButtonGroup>
         <CanvasNavigationButton
-          label={this.props.canRotate ? i18n('VIEW_ROTATE') : i18n('VIEW_ROTATE_DISABLED')}
+          label={i18n('VIEW_ROTATE')}
           icon="rotate"
           onClick={this.props.onClick}
-          disabled={!this.props.canRotate}
           tooltipPlacement='right'
         />
       </CanvasNavigationButtonGroup>

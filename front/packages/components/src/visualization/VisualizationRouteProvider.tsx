@@ -217,7 +217,7 @@ export const createRouteParams = (
     bearing: isNumber(viewState?.bearing) ? viewState.bearing : undefined,
     rotationX: isNumber(viewState?.rotationX) ? viewState.rotationX : undefined,
     rotationOrbit: isNumber(viewState?.rotationOrbit) ? viewState.rotationOrbit : undefined,
-    viewRotationOffset: viewState?.viewRotationOffset ? viewState.viewRotationOffset : undefined,
+    viewRotationOffset: viewState?.rotationOffset ? viewState.rotationOffset : undefined,
     filter: getFilterParam(selectedFilters),
     fallbackVisualizationId,
     visualizationScope,

@@ -77,7 +77,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
     for (const row of props.rows) {
       const lastModified = this.getLastModified(props, row)
       const rotation = new ImageRotation(Number(props.encoding.image?.getView(row)))
-      const view = rotation.getAngleWithOffset(props.viewState.viewRotationOffset)
+      const view = rotation.getAngleWithOffset(props.viewState.rotationOffset)
       const image = new Image({
         id: props.encoding.image?.getId(row),
         fallback: props.encoding.image?.getFallback(row),
@@ -152,7 +152,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
     const bounds = this.getBounds(props, selectedRow, props.encoding?.position!.coordinates)
     const lastModified = this.getLastModified(props, selectedRow)
     const rotation = new ImageRotation(Number(props.encoding.image?.getView(selectedRow)))
-    const view = rotation.getAngleWithOffset(props.viewState.viewRotationOffset)
+    const view = rotation.getAngleWithOffset(props.viewState.rotationOffset)
     const imageFetchUrl = new ImageFetch().getUrl({
       id: props.encoding.image?.getId(selectedRow),
       fallback: props.encoding.image?.getFallback(selectedRow),

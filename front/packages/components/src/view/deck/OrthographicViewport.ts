@@ -18,6 +18,7 @@ export type OrthographicViewportOptions = DeckOrthographicViewportOptions & {
   scaleFactor?: number
   limitNavigation: boolean
   axesDimensions?: AxesDimensions
+  rotationOffset?: number
 };
 
 export class OrthographicViewport extends Viewport {
@@ -29,6 +30,7 @@ export class OrthographicViewport extends Viewport {
   limitNavigation?: boolean
   translationMatrix?: number[]
   axesDimensions?: AxesDimensions
+  rotationOffset?: number
 
   constructor(props: Partial<OrthographicViewportOptions>) {
     let {
@@ -47,6 +49,7 @@ export class OrthographicViewport extends Viewport {
       centerCoordinates = new Coordinates(),
       scaleFactor = 1,
       axesDimensions,
+      rotationOffset = 0,
     } = {...props}
 
     const zoomX = getZoomX(zoom, fixedX)
@@ -70,6 +73,7 @@ export class OrthographicViewport extends Viewport {
       viewMatrix: getViewMatrix({
         scale,
         flipY,
+        rotation: rotationOffset,
       }),
       projectionMatrix: getProjectionMatrix({
         width: width || 1,
@@ -92,6 +96,7 @@ export class OrthographicViewport extends Viewport {
     this.limitNavigation = limitNavigation
     this.translationMatrix = translationMatrix
     this.axesDimensions = axesDimensions
+    this.rotationOffset = rotationOffset
   }
 
   projectFlat([X, Y]) {

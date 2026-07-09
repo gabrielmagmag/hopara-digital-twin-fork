@@ -8,7 +8,6 @@ import { ActionButtonsContainer } from './buttons/ActionButtonsContainer'
 import { AutoNavigateButton } from './buttons/AutoNavigateButton'
 import { SearchButtonContainer } from './buttons/SearchButtonContainer'
 import { ElevatorContainer } from './buttons/ElevatorContainer'
-import { ImageRotateButtonContainer } from './buttons/ImageRotateButtonContainer'
 import { ViewRotateButtonContainer } from './buttons/ViewRotateButtonContainer'
 
 export class WhiteBoardNavigationComponent extends PureComponent<StateProps & ActionProps> {
@@ -31,7 +30,6 @@ export class WhiteBoardNavigationComponent extends PureComponent<StateProps & Ac
           <AutoNavigateButton active={this.props.isAutoNavigationEnabled} onClick={this.props.onAutoNavigateClick} />
         }
         <ElevatorContainer />
-        <ImageRotateButtonContainer />
         <ViewRotateButtonContainer />
         <ActionButtonsContainer/>
       </>
