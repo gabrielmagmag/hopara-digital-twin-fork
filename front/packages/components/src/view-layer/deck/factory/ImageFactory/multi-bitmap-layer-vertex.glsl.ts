@@ -15,6 +15,10 @@ attribute vec4 instanceBoundsA64Low;
 attribute vec4 instanceBoundsB64Low;
 
 uniform float opacity;
+// Anti-skew applied around the quad center so the isometric view matrix renders
+// the image as an undistorted rectangle anchored at the projected center.
+// Identity when the visualization is not isometric.
+uniform mat2 unskewMatrix;
 
 varying vec2 vTexCoord;
 varying float vOpacity;
@@ -43,6 +47,13 @@ void main(void) {
   vec2 leftLow = mix(c0Low, c1Low, v);
   vec2 rightLow = mix(c3Low, c2Low, v);
   vec2 pos2dLow = mix(leftLow, rightLow, u);
+
+  // The unskew map is affine and mix is an affine combination, so applying it
+  // to the interpolated position equals applying it to each corner
+  vec2 quadCenter = (c0 + c1 + c2 + c3) * 0.25;
+  pos2d = quadCenter + unskewMatrix * (pos2d - quadCenter);
+  vec2 quadCenterLow = (c0Low + c1Low + c2Low + c3Low) * 0.25;
+  pos2dLow = quadCenterLow + unskewMatrix * (pos2dLow - quadCenterLow);
 
   geometry.worldPosition = vec3(pos2d, 0.0);
   geometry.uv = texCoords;

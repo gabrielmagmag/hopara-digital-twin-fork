@@ -136,6 +136,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
         id: `${props.id}-${image.getId()}`,
         data: rows,
         getBounds: (row) => this.getBounds(props, row, props.encoding?.position!.coordinates),
+        unskewMatrix: props.viewport instanceof OrthographicViewport ? props.viewport.getUnskewMatrix() : [1, 0, 0, 1],
         image: this.getImageUrl(props, rows[0], allBounds, image),
         updateTriggers: {
           getBounds: super.getPositionUpdateTrigger(props.encoding.position, props.edit.isDragging, props.rows),

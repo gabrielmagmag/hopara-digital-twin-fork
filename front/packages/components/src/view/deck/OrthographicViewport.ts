@@ -6,7 +6,7 @@ import { AxesDimensions } from '../../chart/domain/AxesDimension'
 import { Box, Coordinates, Dimensions } from '@hopara/spatial'
 import { Padding } from '@deck.gl/core/typed/viewports/viewport'
 import {OrthographicViewportOptions as DeckOrthographicViewportOptions} from '@deck.gl/core/src/viewports/orthographic-viewport'
-import { getDistanceScales, getProjectionMatrix, getViewMatrix, getZoomX, getZoomY, limitTarget } from './OrthographicProjection'
+import { getDistanceScales, getPlaneMatrix, getProjectionMatrix, getViewMatrix, getZoomX, getZoomY, limitTarget } from './OrthographicProjection'
 import { fitBounds } from './OrthographicFitBounds'
 import { getSizeCommons, getSizePixels, getVisibleWorld, getVisibleWorldDimensions } from './Viewport'
 
@@ -102,6 +102,16 @@ export class OrthographicViewport extends Viewport {
     this.axesDimensions = axesDimensions
     this.rotationOffset = rotationOffset
     this.isometric = isometric
+  }
+
+  // The 2x2 inverse of the plane transform (isometric skew + rotation offset) as a
+  // column-major array for a GLSL mat2 uniform. Applied around each image quad center
+  // so the image always renders as an upright rectangle anchored at the projected
+  // center — the rotated artwork variant conveys the view rotation instead
+  getUnskewMatrix(): number[] {
+    if (!this.isometric && !this.rotationOffset) return [1, 0, 0, 1]
+    const inverse = getPlaneMatrix({rotation: this.rotationOffset, isometric: this.isometric}).invert()
+    return [inverse[0], inverse[1], inverse[4], inverse[5]]
   }
 
   projectFlat([X, Y]) {

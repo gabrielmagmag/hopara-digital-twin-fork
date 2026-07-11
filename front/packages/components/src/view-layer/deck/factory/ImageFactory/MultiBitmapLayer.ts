@@ -23,6 +23,9 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
     // Single image/texture to be used across all bounds
     image: { type: 'object', value: null, async: true },
     
+    // Column-major mat2 canceling the isometric view skew around each quad center
+    unskewMatrix: { type: 'array', value: [1, 0, 0, 1] },
+
     // Visual properties
     opacity: { type: 'number', value: 1, min: 0, max: 1 },
     desaturate: { type: 'number', value: 0, min: 0, max: 1 },
@@ -162,13 +165,14 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
 
   draw({ uniforms }) {
     const { texture, model } = this.state
-    const { 
-      desaturate, 
-      transparentColor, 
+    const {
+      desaturate,
+      transparentColor,
       tintColor,
       opacity,
-      data
-    } = this.props
+      data,
+      unskewMatrix,
+    } = this.props as any
 
     if (!texture || !model || !data) {
       return
@@ -177,6 +181,7 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
     model.setUniforms({
       ...uniforms,
       bitmapTexture: texture,
+      unskewMatrix: unskewMatrix ?? [1, 0, 0, 1],
       desaturate: desaturate || 0,
       transparentColor: transparentColor!.map((x) => x! / 255),
       tintColor: tintColor!.slice(0, 3).map((x) => x / 255),

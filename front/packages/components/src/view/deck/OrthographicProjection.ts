@@ -68,11 +68,18 @@ export const limitTarget = (target, width, height, zoom, axesDimensions?: AxesDi
 const ISOMETRIC_ROTATION = Math.PI / 4
 const ISOMETRIC_VERTICAL_SCALE = Math.tan(Math.PI / 6)
 
-export const getViewMatrix = ({scale, flipY, rotation = 0, isometric = false}: {scale: number, flipY: boolean, rotation?: number, isometric?: boolean}) => {
-  const mat = viewMatrix.clone().scale([scale, scale * (flipY ? -1 : 1), scale])
+// The linear part of the view matrix without the uniform zoom scale
+export const getPlaneMatrix = ({rotation = 0, isometric = false}: {rotation?: number, isometric?: boolean}) => {
+  const mat = new Matrix4()
   if (isometric) mat.scale([1, ISOMETRIC_VERTICAL_SCALE, 1]).rotateZ(ISOMETRIC_ROTATION)
   if (rotation) mat.rotateZ(rotation * Math.PI / 180)
   return mat
+}
+
+export const getViewMatrix = ({scale, flipY, rotation = 0, isometric = false}: {scale: number, flipY: boolean, rotation?: number, isometric?: boolean}) => {
+  return viewMatrix.clone()
+    .scale([scale, scale * (flipY ? -1 : 1), scale])
+    .multiplyRight(getPlaneMatrix({rotation, isometric}))
 }
 
 export const getZoomX = (zoom, fixed: boolean) : number => {
