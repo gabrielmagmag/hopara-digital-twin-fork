@@ -258,6 +258,7 @@ class ViewState {
       height: this.getDimensions()?.height,
       width: this.getDimensions()?.width,
       rotationOffset: this.rotationOffset,
+      isometric: this.visualizationType === VisualizationType.ISOMETRIC_WHITEBOARD,
     }
   }
 

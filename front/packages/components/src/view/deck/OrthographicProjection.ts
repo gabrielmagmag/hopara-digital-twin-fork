@@ -63,8 +63,14 @@ export const limitTarget = (target, width, height, zoom, axesDimensions?: AxesDi
 
   return target
 }
-export const getViewMatrix = ({scale, flipY, rotation = 0}: {scale: number, flipY: boolean, rotation?: number}) => {
+// True isometric: 45° rotation on the plane followed by the tilt foreshortening,
+// so the world axes end up at ±30° from the horizontal (tan 30° vertical scale)
+const ISOMETRIC_ROTATION = Math.PI / 4
+const ISOMETRIC_VERTICAL_SCALE = Math.tan(Math.PI / 6)
+
+export const getViewMatrix = ({scale, flipY, rotation = 0, isometric = false}: {scale: number, flipY: boolean, rotation?: number, isometric?: boolean}) => {
   const mat = viewMatrix.clone().scale([scale, scale * (flipY ? -1 : 1), scale])
+  if (isometric) mat.scale([1, ISOMETRIC_VERTICAL_SCALE, 1]).rotateZ(ISOMETRIC_ROTATION)
   if (rotation) mat.rotateZ(rotation * Math.PI / 180)
   return mat
 }
