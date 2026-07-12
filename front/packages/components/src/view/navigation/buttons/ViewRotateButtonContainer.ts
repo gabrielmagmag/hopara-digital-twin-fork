@@ -9,8 +9,11 @@ export const mapState = (): StateProps => {
 
 export const mapActions = (dispatch: Dispatch): ActionProps => {
   return {
-    onClick: () => {
-      dispatch(actions.navigation.viewRotateRequested())
+    onRotateLeftClick: () => {
+      dispatch(actions.navigation.viewRotateRequested({ direction: 'left' }))
+    },
+    onRotateRightClick: () => {
+      dispatch(actions.navigation.viewRotateRequested({ direction: 'right' }))
     },
   }
 }

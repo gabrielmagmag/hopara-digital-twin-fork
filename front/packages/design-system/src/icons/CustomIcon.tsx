@@ -95,7 +95,9 @@ import { ReactComponent as ChevronExpand } from './custom-icons/chevron-expand.s
 import { ReactComponent as ChevronClose } from './custom-icons/chevron-close.svg'
 import { ReactComponent as RotateLeft } from './custom-icons/rotate-left.svg'
 import { ReactComponent as RotateRight } from './custom-icons/rotate-right.svg'
-import { ReactComponent as Rotate } from './custom-icons/rotate.svg'  
+import { ReactComponent as Rotate } from './custom-icons/rotate.svg'
+import { ReactComponent as ViewRotateLeft } from './custom-icons/view-rotate-left.svg'
+import { ReactComponent as ViewRotateRight } from './custom-icons/view-rotate-right.svg'
 import { Box } from '@mui/material'
 
 
@@ -200,6 +202,8 @@ export const customIcons = {
   'rotate-left': RotateLeft,
   'rotate-right': RotateRight,
   'rotate': Rotate,
+  'view-rotate-left': ViewRotateLeft,
+  'view-rotate-right': ViewRotateRight,
   'send-backward': SendBackward,
   'bring-forward': BringForward
 }

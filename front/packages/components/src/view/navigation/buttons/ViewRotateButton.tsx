@@ -8,7 +8,8 @@ export interface StateProps {
 }
 
 export interface ActionProps {
-  onClick: () => void
+  onRotateLeftClick: () => void
+  onRotateRightClick: () => void
 }
 
 export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
@@ -16,9 +17,15 @@ export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
     return (
       <CanvasNavigationButtonGroup>
         <CanvasNavigationButton
-          label={i18n('VIEW_ROTATE')}
-          icon="rotate"
-          onClick={this.props.onClick}
+          label={i18n('VIEW_ROTATE_LEFT')}
+          icon="view-rotate-left"
+          onClick={this.props.onRotateLeftClick}
+          tooltipPlacement='right'
+        />
+        <CanvasNavigationButton
+          label={i18n('VIEW_ROTATE_RIGHT')}
+          icon="view-rotate-right"
+          onClick={this.props.onRotateRightClick}
           tooltipPlacement='right'
         />
       </CanvasNavigationButtonGroup>

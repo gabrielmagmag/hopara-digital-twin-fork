@@ -681,6 +681,8 @@ export const stringsEnUs = {
   'CREATING_YOUR_SAMPLE_VISUALIZATIONS': 'Creating your sample visualizations. This may take a few minutes.',
   'ROTATE': 'Rotate',
   'VIEW_ROTATE': 'Rotate view',
+  'VIEW_ROTATE_LEFT': 'Rotate view left',
+  'VIEW_ROTATE_RIGHT': 'Rotate view right',
   'VIEW_ROTATE_DISABLED': 'No image layers to rotate',
   'GRID': 'Grid',
   'INVALID_GRID': 'Invalid grid',
