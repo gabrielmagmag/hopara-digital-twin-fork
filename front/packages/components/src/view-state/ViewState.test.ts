@@ -70,3 +70,13 @@ test('get zoom', () => {
   expect(viewState.getTargetZoom(0)).toEqual(1)
   expect(viewState.getTargetZoom(2)).toEqual(2)
 })
+
+test('setRotationOffset propagates to the recreated viewport', () => {
+  const viewState = new TestViewState({
+    orthographic: true,
+    dimensions: {width: 1200, height: 768},
+  })
+
+  const rotated = viewState.setRotationOffset(90)
+  expect((rotated.viewport as OrthographicViewport).rotationOffset).toEqual(90)
+})

@@ -23,8 +23,9 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
     // Single image/texture to be used across all bounds
     image: { type: 'object', value: null, async: true },
     
-    // Column-major mat2 canceling the isometric view skew around each quad center
-    unskewMatrix: { type: 'array', value: [1, 0, 0, 1] },
+    // Column-major mat2 canceling the view plane transform around each quad center.
+    // Compared by value so a rotation offset change re-renders the layer
+    unskewMatrix: { type: 'array', value: [1, 0, 0, 1], compare: true },
 
     // Visual properties
     opacity: { type: 'number', value: 1, min: 0, max: 1 },

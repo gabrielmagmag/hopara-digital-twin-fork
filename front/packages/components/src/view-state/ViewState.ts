@@ -148,6 +148,7 @@ class ViewState {
       width: this.getDimensions()?.width,
       rotationOrbit: this.rotationOrbit ?? 0,
       rotationX: this.rotationX,
+      rotationOffset: this.rotationOffset,
       orbitAxis: this.isOrbitViewport(this.viewport) ? DEFAULT_ORBIT_AXIS : undefined,
       ...this.getCoordinateState(),
       ...this.getTransitionProps(),
@@ -276,6 +277,7 @@ class ViewState {
       target: deckState.target,
       longitude: deckState.longitude,
       latitude: deckState.latitude,
+      rotationOffset: deckState.rotationOffset,
     } as any)
   }
 
