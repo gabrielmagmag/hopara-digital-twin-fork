@@ -41,6 +41,34 @@ test('top center anchor', () => {
   expect(coordinates.toArray(Anchor.TOP_CENTER)).toEqual([5, 10, 0])
 })
 
+test('upper center anchor', () => {
+  const geometry = [
+    [0, 0],
+    [0, 10],
+    [10, 10],
+    [10, 0],
+    [0, 0]]
+
+  const coordinates = new RowCoordinates({x: geometry, y: geometry})
+  expect(coordinates.getAnchoredX(Anchor.UPPER_CENTER)).toEqual(5)
+  expect(coordinates.getAnchoredY(Anchor.UPPER_CENTER)).toEqual(7.5)
+  expect(coordinates.toArray(Anchor.UPPER_CENTER)).toEqual([5, 7.5, 0])
+})
+
+test('lower center anchor', () => {
+  const geometry = [
+    [0, 0],
+    [0, 10],
+    [10, 10],
+    [10, 0],
+    [0, 0]]
+
+  const coordinates = new RowCoordinates({x: geometry, y: geometry})
+  expect(coordinates.getAnchoredX(Anchor.LOWER_CENTER)).toEqual(5)
+  expect(coordinates.getAnchoredY(Anchor.LOWER_CENTER)).toEqual(2.5)
+  expect(coordinates.toArray(Anchor.LOWER_CENTER)).toEqual([5, 2.5, 0])
+})
+
 
 test('to box', () => {
   const geometry = [

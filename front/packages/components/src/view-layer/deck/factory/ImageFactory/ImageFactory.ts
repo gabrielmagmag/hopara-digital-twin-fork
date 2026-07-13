@@ -24,7 +24,9 @@ const editableImageFactory = new EditableImageFactory()
 // Anchor in quad param space: the texture point that lands on the projected quad center
 const ANCHOR_POINTS: { [anchor in Anchor]: [number, number] } = {
   [Anchor.CENTROID]: [0.5, 0.5],
-  [Anchor.BOTTOM_CENTER]: [0.5, 0],
+  [Anchor.BOTTOM_CENTER]: [0.5, 0.25],
+  [Anchor.LOWER_CENTER]: [0.5, 0.25],
+  [Anchor.UPPER_CENTER]: [0.5, 0.75],
   [Anchor.TOP_CENTER]: [0.5, 1],
   [Anchor.LEFT_CENTER]: [0, 0.5],
   [Anchor.RIGHT_CENTER]: [1, 0.5],
