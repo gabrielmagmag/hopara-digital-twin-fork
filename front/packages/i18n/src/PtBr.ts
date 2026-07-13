@@ -625,7 +625,6 @@ export const stringsPtBr: typeof stringsEnUs = {
   'ISOMETRIC_WIREFRAME_GENERATION_STARTED': 'Geração da imagem em wireframe iniciada.',
   'CREATING_YOUR_SAMPLE_VISUALIZATIONS': 'Criando suas visualizações de exemplo. Isso pode levar alguns minutos.',
   'ROTATE': 'Girar',
-  'VIEW_ROTATE': 'Girar visão',
   'VIEW_ROTATE_LEFT': 'Girar para a esquerda',
   'VIEW_ROTATE_RIGHT': 'Girar para a direita',
   'VIEW_ROTATE_DISABLED': 'Sem camadas de imagem para rotacionar',

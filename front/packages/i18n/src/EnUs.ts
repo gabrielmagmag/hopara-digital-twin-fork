@@ -680,7 +680,6 @@ export const stringsEnUs = {
   'ISOMETRIC_WIREFRAME_GENERATION_STARTED': 'Isometric wireframe image generation started.',
   'CREATING_YOUR_SAMPLE_VISUALIZATIONS': 'Creating your sample visualizations. This may take a few minutes.',
   'ROTATE': 'Rotate',
-  'VIEW_ROTATE': 'Rotate view',
   'VIEW_ROTATE_LEFT': 'Rotate view left',
   'VIEW_ROTATE_RIGHT': 'Rotate view right',
   'VIEW_ROTATE_DISABLED': 'No image layers to rotate',
