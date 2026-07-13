@@ -22,17 +22,9 @@ import {LayerType} from '../layer/LayerType'
 import {IsometricMethod} from '../resource/ResourceRepository'
 import {Config} from '@hopara/config'
 import {HoparaCloudBadge} from '@hopara/design-system/src/branding/HoparaCloudBadge'
+import {CloudFeatureLabel} from '@hopara/design-system/src/branding/CloudFeatureLabel'
 
 const cloudFeaturesEnabled = Config.getValueAsBoolean('CLOUD_FEATURES_ENABLED')
-
-const CloudFeatureLabel = ({featureName}: {featureName: string}) => (
-  <Box sx={{textAlign: 'center'}}>
-    <div>{featureName}</div>
-    <Box sx={{opacity: 0.7, fontSize: 11, marginTop: '2px'}}>
-      <HoparaCloudBadge />
-    </Box>
-  </Box>
-)
 
 export interface StateProps {
   hasUndoRow?: boolean;
