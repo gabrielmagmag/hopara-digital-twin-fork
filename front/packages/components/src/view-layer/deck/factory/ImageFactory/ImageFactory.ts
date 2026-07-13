@@ -2,7 +2,7 @@ import {BaseFactory} from '../BaseFactory'
 import {DeckLayer} from '../../DeckLayer'
 import {Row} from '@hopara/dataset'
 import {DeckLayerProps} from '../../../DeckLayerFactory'
-import {Bounds} from '@hopara/spatial'
+import {Anchor, Bounds} from '@hopara/spatial'
 import {CoordinatesPositionEncoding, ImageEncoding} from '@hopara/encoding'
 import {OrthographicViewport} from '../../../../view/deck/OrthographicViewport'
 import {BitmapManager} from './BitmapManager/BitmapManager'
@@ -20,6 +20,15 @@ import { Image } from './Image'
 import MultiBitmapLayer from './MultiBitmapLayer'
 
 const editableImageFactory = new EditableImageFactory()
+
+// Anchor in quad param space: the texture point that lands on the projected quad center
+const ANCHOR_POINTS: { [anchor in Anchor]: [number, number] } = {
+  [Anchor.CENTROID]: [0.5, 0.5],
+  [Anchor.BOTTOM_CENTER]: [0.5, 0],
+  [Anchor.TOP_CENTER]: [0.5, 1],
+  [Anchor.LEFT_CENTER]: [0, 0.5],
+  [Anchor.RIGHT_CENTER]: [1, 0.5],
+}
 type ImageMap = {
   [imageId: string]: {
     rows: Row[]
@@ -137,6 +146,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
         data: rows,
         getBounds: (row) => this.getBounds(props, row, props.encoding?.position!.coordinates),
         unskewMatrix: props.viewport instanceof OrthographicViewport ? props.viewport.getUnskewMatrix() : [1, 0, 0, 1],
+        anchorPoint: ANCHOR_POINTS[props.encoding.position?.anchor ?? Anchor.CENTROID] ?? ANCHOR_POINTS[Anchor.CENTROID],
         image: this.getImageUrl(props, rows[0], allBounds, image),
         updateTriggers: {
           getBounds: super.getPositionUpdateTrigger(props.encoding.position, props.edit.isDragging, props.rows),
