@@ -118,6 +118,7 @@ export function fillWithEquivalentFields(positionEncoding:PositionEncoding, colu
 
   filledPositionEncoding.data = positionEncoding.data
   filledPositionEncoding.scope = positionEncoding.scope
+  filledPositionEncoding.anchor = positionEncoding.anchor
   return filledPositionEncoding
 }
 

@@ -19,4 +19,8 @@ export class ImageRotation {
 
     return this.currentAngle - ANGLE_STEP
   }
+
+  getAngleWithOffset(offset: number | undefined): number {
+    return (this.currentAngle + (offset ?? 0)) % (ANGLE_STEP * ANGLE_COUNT)
+  }
 }

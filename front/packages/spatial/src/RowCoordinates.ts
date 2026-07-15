@@ -103,10 +103,16 @@ export class RowCoordinates {
       }
 
       const [minX, minY, maxX, maxY] = bbox(geometry)
+      const centerX = (minX + maxX) / 2
+      const centerY = (minY + maxY) / 2
       if ( anchor === Anchor.TOP_CENTER) {
-        return [(minX + maxX) / 2, maxY, 0]
+        return [centerX, maxY, 0]
+      } else if ( anchor === Anchor.UPPER_CENTER) {
+        return [centerX, (centerY + maxY) / 2, 0]
       } else if ( anchor === Anchor.BOTTOM_CENTER) {
-        return [(minX + maxX) / 2, minY, 0]
+        return [centerX, minY, 0]
+      } else if ( anchor === Anchor.LOWER_CENTER) {
+        return [centerX, (centerY + minY) / 2, 0]
       } else if ( anchor === Anchor.RIGHT_CENTER ) {
         return [maxX, (minY + maxY) / 2, 0]
       } else if ( anchor === Anchor.LEFT_CENTER ) {

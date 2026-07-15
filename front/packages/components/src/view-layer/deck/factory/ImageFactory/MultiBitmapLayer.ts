@@ -23,6 +23,13 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
     // Single image/texture to be used across all bounds
     image: { type: 'object', value: null, async: true },
     
+    // Column-major mat2 canceling the view plane transform around each quad center.
+    // Compared by value so a rotation offset change re-renders the layer
+    unskewMatrix: { type: 'array', value: [1, 0, 0, 1], compare: true },
+
+    // Anchor in quad param space: the texture point that lands on the projected quad center
+    anchorPoint: { type: 'array', value: [0.5, 0.5], compare: true },
+
     // Visual properties
     opacity: { type: 'number', value: 1, min: 0, max: 1 },
     desaturate: { type: 'number', value: 0, min: 0, max: 1 },
@@ -162,13 +169,15 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
 
   draw({ uniforms }) {
     const { texture, model } = this.state
-    const { 
-      desaturate, 
-      transparentColor, 
+    const {
+      desaturate,
+      transparentColor,
       tintColor,
       opacity,
-      data
-    } = this.props
+      data,
+      unskewMatrix,
+      anchorPoint,
+    } = this.props as any
 
     if (!texture || !model || !data) {
       return
@@ -177,6 +186,8 @@ export default class MultiBitmapLayer<T, P extends BitmapLayerProps<T>> extends 
     model.setUniforms({
       ...uniforms,
       bitmapTexture: texture,
+      unskewMatrix: unskewMatrix ?? [1, 0, 0, 1],
+      anchorPoint: anchorPoint ?? [0.5, 0.5],
       desaturate: desaturate || 0,
       transparentColor: transparentColor!.map((x) => x! / 255),
       tintColor: tintColor!.slice(0, 3).map((x) => x / 255),

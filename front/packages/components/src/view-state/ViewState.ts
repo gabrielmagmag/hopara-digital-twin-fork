@@ -92,6 +92,7 @@ class ViewState {
   zoomBehavior: ZoomBehavior
   rotationOrbit?: number
   rotationX?: number
+  rotationOffset?: number
   dimensions: Dimensions
   viewport: OrbitViewport | WebMercatorViewport | OrthographicViewport
   zoomBackPosition?: Position
@@ -125,7 +126,6 @@ class ViewState {
     return this.coordinates
   }
 
-
   getCoordinateState(): { x: number, y: number, longitude?: number, latitude?: number, target: number[] } {
     const coordinates = !this.coordinates ? (this.initialPosition?.getCoordinates() ?? this.center ?? new Coordinates()) : this.coordinates
     return {
@@ -148,6 +148,7 @@ class ViewState {
       width: this.getDimensions()?.width,
       rotationOrbit: this.rotationOrbit ?? 0,
       rotationX: this.rotationX,
+      rotationOffset: this.rotationOffset,
       orbitAxis: this.isOrbitViewport(this.viewport) ? DEFAULT_ORBIT_AXIS : undefined,
       ...this.getCoordinateState(),
       ...this.getTransitionProps(),
@@ -257,6 +258,8 @@ class ViewState {
       centerCoordinates: this.center,
       height: this.getDimensions()?.height,
       width: this.getDimensions()?.width,
+      rotationOffset: this.rotationOffset,
+      isometric: this.visualizationType === VisualizationType.ISOMETRIC_WHITEBOARD,
     }
   }
 
@@ -274,6 +277,7 @@ class ViewState {
       target: deckState.target,
       longitude: deckState.longitude,
       latitude: deckState.latitude,
+      rotationOffset: deckState.rotationOffset,
     } as any)
   }
 
@@ -506,6 +510,10 @@ class ViewState {
     if (!this.zoomBackPosition) return this
     const cloned = this.clone({zoomBackPosition: undefined})
     return cloned.transition(this.zoomBackPosition, true)
+  }
+
+  setRotationOffset(offset: number): ViewState {
+    return this.clone({ rotationOffset: offset })
   }
 
   setAutoRotate(autoRotate: boolean): ViewState {

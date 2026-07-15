@@ -15,6 +15,13 @@ attribute vec4 instanceBoundsA64Low;
 attribute vec4 instanceBoundsB64Low;
 
 uniform float opacity;
+// Anti-skew applied around the quad center so the isometric view matrix renders
+// the image as an undistorted rectangle anchored at the projected center.
+// Identity when the visualization is not isometric.
+uniform mat2 unskewMatrix;
+// Anchor in quad param space (u, v): the texture point that lands on the
+// projected quad center. (0.5, 0.5) = image center, (0.5, 0) = bottom center
+uniform vec2 anchorPoint;
 
 varying vec2 vTexCoord;
 varying float vOpacity;
@@ -43,6 +50,18 @@ void main(void) {
   vec2 leftLow = mix(c0Low, c1Low, v);
   vec2 rightLow = mix(c3Low, c2Low, v);
   vec2 pos2dLow = mix(leftLow, rightLow, u);
+
+  // The unskew map is affine and mix is an affine combination, so applying it
+  // to the interpolated position equals applying it to each corner.
+  // Offsets are taken from the anchor so its texture point lands on the
+  // projected quad center (e.g. bottom-center anchor puts the machine's feet
+  // on its location and the artwork rises from there)
+  vec2 quadCenter = (c0 + c1 + c2 + c3) * 0.25;
+  vec2 anchor = mix(mix(c0, c1, anchorPoint.y), mix(c3, c2, anchorPoint.y), anchorPoint.x);
+  pos2d = quadCenter + unskewMatrix * (pos2d - anchor);
+  vec2 quadCenterLow = (c0Low + c1Low + c2Low + c3Low) * 0.25;
+  vec2 anchorLow = mix(mix(c0Low, c1Low, anchorPoint.y), mix(c3Low, c2Low, anchorPoint.y), anchorPoint.x);
+  pos2dLow = quadCenterLow + unskewMatrix * (pos2dLow - anchorLow);
 
   geometry.worldPosition = vec3(pos2d, 0.0);
   geometry.uv = texCoords;

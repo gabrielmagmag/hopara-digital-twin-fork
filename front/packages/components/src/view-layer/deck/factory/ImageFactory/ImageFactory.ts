@@ -2,7 +2,7 @@ import {BaseFactory} from '../BaseFactory'
 import {DeckLayer} from '../../DeckLayer'
 import {Row} from '@hopara/dataset'
 import {DeckLayerProps} from '../../../DeckLayerFactory'
-import {Bounds} from '@hopara/spatial'
+import {Anchor, Bounds} from '@hopara/spatial'
 import {CoordinatesPositionEncoding, ImageEncoding} from '@hopara/encoding'
 import {OrthographicViewport} from '../../../../view/deck/OrthographicViewport'
 import {BitmapManager} from './BitmapManager/BitmapManager'
@@ -11,6 +11,7 @@ import {EditableImageFactory} from '../EditableFactory/EditableImageFactory'
 import {ViewLayerEditingMode} from '../../../ViewLayerStore'
 import {isNil} from 'lodash/fp'
 import {ImageFetch} from '@hopara/resource'
+import {ImageRotation} from '../../../../image/ImageRotation'
 import { ImageLoader } from './ImageLoader'
 import GL from '@luma.gl/constants'
 import ViewState from '../../../../view-state/ViewState'
@@ -19,6 +20,16 @@ import { Image } from './Image'
 import MultiBitmapLayer from './MultiBitmapLayer'
 
 const editableImageFactory = new EditableImageFactory()
+
+const ANCHOR_POINTS: { [anchor in Anchor]: [number, number] } = {
+  [Anchor.CENTROID]: [0.5, 0.5],
+  [Anchor.BOTTOM_CENTER]: [0.5, 0],
+  [Anchor.LOWER_CENTER]: [0.5, 0.25],
+  [Anchor.UPPER_CENTER]: [0.5, 0.75],
+  [Anchor.TOP_CENTER]: [0.5, 1],
+  [Anchor.LEFT_CENTER]: [0, 0.5],
+  [Anchor.RIGHT_CENTER]: [1, 0.5],
+}
 type ImageMap = {
   [imageId: string]: {
     rows: Row[]
@@ -75,11 +86,13 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
 
     for (const row of props.rows) {
       const lastModified = this.getLastModified(props, row)
+      const rotation = new ImageRotation(Number(props.encoding.image?.getView(row)))
+      const view = rotation.getAngleWithOffset(props.viewState.rotationOffset)
       const image = new Image({
         id: props.encoding.image?.getId(row),
         fallback: props.encoding.image?.getFallback(row),
         library: props.encoding.image?.scope,
-        view: props.encoding.image?.getView(row),
+        view: String(view),
         resolution: props.encoding.image?.resolution,
         tenant: props.resource.authorization.tenant,
         version: lastModified,
@@ -98,7 +111,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
   getDownloadProgressCallback(props: DeckLayerProps, imageId: string) {
     const bitmapManager = this.bitmapManagers[imageId]
     if ( !bitmapManager ) return props.resource.onResourceDownloadProgressChange
-  }
+  } 
 
   getAbortController(props: DeckLayerProps, imageId: string) {
     return () => {
@@ -133,6 +146,8 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
         id: `${props.id}-${image.getId()}`,
         data: rows,
         getBounds: (row) => this.getBounds(props, row, props.encoding?.position!.coordinates),
+        unskewMatrix: props.viewport instanceof OrthographicViewport ? props.viewport.getUnskewMatrix() : [1, 0, 0, 1],
+        anchorPoint: ANCHOR_POINTS[props.encoding.position?.anchor ?? Anchor.CENTROID] ?? ANCHOR_POINTS[Anchor.CENTROID],
         image: this.getImageUrl(props, rows[0], allBounds, image),
         updateTriggers: {
           getBounds: super.getPositionUpdateTrigger(props.encoding.position, props.edit.isDragging, props.rows),
@@ -148,11 +163,13 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
     const id = `${props.id}-${selectedRow._id}`
     const bounds = this.getBounds(props, selectedRow, props.encoding?.position!.coordinates)
     const lastModified = this.getLastModified(props, selectedRow)
+    const rotation = new ImageRotation(Number(props.encoding.image?.getView(selectedRow)))
+    const view = rotation.getAngleWithOffset(props.viewState.rotationOffset)
     const imageFetchUrl = new ImageFetch().getUrl({
       id: props.encoding.image?.getId(selectedRow),
       fallback: props.encoding.image?.getFallback(selectedRow),
       library: props.encoding.image?.scope,
-      view: props.encoding.image?.getView(selectedRow),
+      view: String(view),
       tenant: props.resource.authorization.tenant,
       version: lastModified,
       webGLMaxTextureSize: props.resource.maxTextureSize,

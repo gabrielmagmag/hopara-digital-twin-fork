@@ -10,7 +10,7 @@ describe('ResourceRepository.generateIsometric', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.spyOn(Config, 'getValue').mockReturnValue('http://resource.test')
+    jest.spyOn(Config, 'getValue').mockReturnValue('https://resource.test')
     ;(httpClient.httpPut as jest.Mock).mockResolvedValue({ data: { dimensions: { width: 1, height: 1 } } })
   })
 
