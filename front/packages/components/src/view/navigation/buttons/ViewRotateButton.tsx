@@ -9,6 +9,7 @@ import { CloudFeatureLabel } from '@hopara/design-system/src/branding/CloudFeatu
 const cloudFeaturesEnabled = Config.getValueAsBoolean('CLOUD_FEATURES_ENABLED')
 
 export interface StateProps {
+  visible: boolean
 }
 
 export interface ActionProps {
@@ -18,6 +19,8 @@ export interface ActionProps {
 
 export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
   render() {
+    if (!this.props.visible) return null
+
     return (
       <CanvasNavigationButtonGroup>
         <CanvasNavigationButton
