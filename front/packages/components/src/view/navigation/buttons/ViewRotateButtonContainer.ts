@@ -5,10 +5,8 @@ import { ActionProps, ViewRotateButton, StateProps } from './ViewRotateButton'
 import { VisualizationType } from '../../../visualization/Visualization'
 import actions from '../../../state/Actions'
 
-export const mapState = (store: Store): StateProps => {
-  return {
-    visible: store.visualizationStore.visualization?.type === VisualizationType.ISOMETRIC_WHITEBOARD,
-  }
+export const mapState = (): StateProps => {
+  return {}
 }
 
 export const mapActions = (dispatch: Dispatch): ActionProps => {
@@ -22,4 +20,8 @@ export const mapActions = (dispatch: Dispatch): ActionProps => {
   }
 }
 
-export const ViewRotateButtonContainer = connect(mapState, mapActions)(ViewRotateButton as any)
+const shouldRender = (store: Store) => {
+  return store.visualizationStore.visualization?.type === VisualizationType.ISOMETRIC_WHITEBOARD
+}
+
+export const ViewRotateButtonContainer = connect(mapState, mapActions, shouldRender)(ViewRotateButton as any)
