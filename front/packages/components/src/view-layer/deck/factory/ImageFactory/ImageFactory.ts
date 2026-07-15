@@ -21,10 +21,9 @@ import MultiBitmapLayer from './MultiBitmapLayer'
 
 const editableImageFactory = new EditableImageFactory()
 
-// Anchor in quad param space: the texture point that lands on the projected quad center
 const ANCHOR_POINTS: { [anchor in Anchor]: [number, number] } = {
   [Anchor.CENTROID]: [0.5, 0.5],
-  [Anchor.BOTTOM_CENTER]: [0.5, 0.25],
+  [Anchor.BOTTOM_CENTER]: [0.5, 0],
   [Anchor.LOWER_CENTER]: [0.5, 0.25],
   [Anchor.UPPER_CENTER]: [0.5, 0.75],
   [Anchor.TOP_CENTER]: [0.5, 1],
