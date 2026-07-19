@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.hopara.app/app/0.58",
   "name": "Isometric Whiteboard",
-  "type": "WHITEBOARD",
+  "type": "ISOMETRIC_WHITEBOARD",
   "encodingScope": "QUERY",
   "group": "USER",
   "actions": [],
