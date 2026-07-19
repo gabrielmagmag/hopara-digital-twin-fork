@@ -71,12 +71,13 @@ const responseToAction = (response: VisualizationResponse, params?: Visualizatio
   const world = WorldFactory.createFromVisualization(response.visualization)
   const viewState = getViewState(response.visualization, response.initialViewState, world, params, oldViewState)
   const viewController = new ViewController({visualizationType: response.visualization.type})
+  const visualizationScope = params?.visualizationScope ?? response.scope ?? response.visualization.id
 
   const layerFactory = new LayerFactory({
     queries: response.queries,
     zoomRange: response.initialViewState.zoomRange,
     layerDefaults: response.layerDefaults,
-    scope: params?.visualizationScope ?? response.scope,
+    scope: visualizationScope,
     visualizationType: response.visualization.type,
     layerTemplates: response.layerTemplates,
     visualizationCreatedVersion: response.visualization?.createdVersion,
@@ -85,7 +86,7 @@ const responseToAction = (response: VisualizationResponse, params?: Visualizatio
 
   return {
     ...response,
-    scope: params?.visualizationScope ?? response.scope,
+    scope: visualizationScope,
     world,
     viewState,
     viewController,
@@ -278,4 +279,3 @@ export const fetchVisualizationSagas = () => [
   takeLatest(actions.visualization.changed, refreshVisualization),
   takeLatest(actions.hoc.broadcastUpdate, refreshBroadcastedVisualization),
 ]
-
