@@ -4,6 +4,20 @@ import {EditableGeoJsonLayer as NebulaEditableGeoJsonLayer} from 'nebula.gl'
 export class EditableGeoJsonLayer extends NebulaEditableGeoJsonLayer {
   static layerName = 'EditableGeoJsonLayer'
 
+  // Billboarded path strokes compute their width offsets from the raw projected
+  // segment directions AFTER the DECKGL_FILTER_GL_POSITION hook, so the
+  // UnskewExtension can only move the centerline — the thickness band stays
+  // perpendicular to the pre-unskew (skewed) direction, making edge thickness
+  // uneven. Non-billboard strokes fold the offset into geometry.position before
+  // the hook and render uniformly. Billboarding is only needed for pitched
+  // views, and this app always renders with pitch 0.
+  // Nebula also scales stroke widths by 2/3 (PROJECTED_PIXEL_SIZE_MULTIPLIER),
+  // making its lines thinner than the same nominal width on regular layers
+  static defaultProps = {
+    billboard: false,
+    lineWidthScale: 1,
+  }
+
   _onpanmove(event: any) {
     const { srcEvent } = event
     const screenCoords = this.getScreenCoords(srcEvent) as any
