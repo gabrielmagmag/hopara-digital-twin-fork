@@ -17,6 +17,7 @@ import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers'
 import { DistortMode } from './TransformMode/DistortMode'
 import { polygon } from '@turf/helpers'
 import { geometricFromViewport } from '../../../../geometric/GeometricFactory'
+import { getUnskewLayerProps } from '../../unskew/UnskewExtension'
 
 const ImageTransformMode = new TransformMode([new TranslateMode(), new ScaleMode(), new RotateMode()])
 const ImageCropMode = new TransformMode([new TranslateMode(), new ScaleMode(), new DistortMode()])
@@ -34,6 +35,13 @@ export class EditableImageFactory extends BaseFactory<DeckLayerProps> {
 
   isCropMode(props: EditableImageFactoryProps) {
     return props.edit.editingMode === ViewLayerEditingMode.CROP
+  }
+
+  // Renders the overlay with the same anti-skew the image layer applies in its
+  // vertex shader, so selection/crop overlays hug the upright image while the
+  // edited geometry stays in plain 2D space (nothing to reskew on save)
+  getUnskewProps(props: EditableImageFactoryProps) {
+    return getUnskewLayerProps(props.viewport, [...props.bounds], props.encoding.position?.anchor)
   }
 
   handleCropEdit(props: EditableImageFactoryProps, callbacks: DeckLayerCallbacks, event: any) {
@@ -141,6 +149,7 @@ export class EditableImageFactory extends BaseFactory<DeckLayerProps> {
       onEdit: (event) => this.handleOnEdit(props, event),
       onUpdateCursor: props.callbacks.onUpdateCursor,
       ...EditableGeometryFactory.getEditingHandlerProps(props.editAccentColor, props.viewport, props.edit.editingMode, cropBounds ?? props.bounds),
+      ...this.getUnskewProps(props),
     }))
   }
 
@@ -150,26 +159,35 @@ export class EditableImageFactory extends BaseFactory<DeckLayerProps> {
     const cropBounds = this.getCropBounds(props)
     if (!cropBounds) return []
 
+    // The mask operation layer stays raw: masking is evaluated in data space
+    // (raw mask geometry against raw sampling positions), while the unskew only
+    // moves where the visible layers render
+    const unskewProps = this.getUnskewProps(props) as any
+    const unskewExtensions = unskewProps.extensions ?? []
+
     return [
       new GeoJsonLayer({
+        ...unskewProps,
         id: `${props.id}-mask-fill`,
         data: props.bounds.toFeatureCollection(),
         getFillColor: [0, 0, 0, 20],
         stroked: false,
       }),
       new GeoJsonLayer({
+        ...unskewProps,
         id: `${props.id}-mask-fill-inner`,
         data: props.bounds.toFeatureCollection(),
         getFillColor: [255, 255, 255, 255],
         stroked: false,
-        extensions: [new (DeckExtensions as any).MaskExtension()],
+        extensions: [...unskewExtensions, new (DeckExtensions as any).MaskExtension()],
         maskId: 'mask',
       }),
       new BitmapLayer({
         ...props.imageProps,
+        ...unskewProps,
         opacity: 1,
         id: `${props.id}-mask`,
-        extensions: [new (DeckExtensions as any).MaskExtension()],
+        extensions: [...unskewExtensions, new (DeckExtensions as any).MaskExtension()],
         maskId: 'mask',
       } as any),
       new GeoJsonLayer({

@@ -2,7 +2,7 @@ import {BaseFactory} from '../BaseFactory'
 import {DeckLayer} from '../../DeckLayer'
 import {Row} from '@hopara/dataset'
 import {DeckLayerProps} from '../../../DeckLayerFactory'
-import {Anchor, Bounds} from '@hopara/spatial'
+import {Bounds, getAnchorPoint} from '@hopara/spatial'
 import {CoordinatesPositionEncoding, ImageEncoding} from '@hopara/encoding'
 import {OrthographicViewport} from '../../../../view/deck/OrthographicViewport'
 import {BitmapManager} from './BitmapManager/BitmapManager'
@@ -21,15 +21,6 @@ import MultiBitmapLayer from './MultiBitmapLayer'
 
 const editableImageFactory = new EditableImageFactory()
 
-const ANCHOR_POINTS: { [anchor in Anchor]: [number, number] } = {
-  [Anchor.CENTROID]: [0.5, 0.5],
-  [Anchor.BOTTOM_CENTER]: [0.5, 0],
-  [Anchor.LOWER_CENTER]: [0.5, 0.25],
-  [Anchor.UPPER_CENTER]: [0.5, 0.75],
-  [Anchor.TOP_CENTER]: [0.5, 1],
-  [Anchor.LEFT_CENTER]: [0, 0.5],
-  [Anchor.RIGHT_CENTER]: [1, 0.5],
-}
 type ImageMap = {
   [imageId: string]: {
     rows: Row[]
@@ -147,7 +138,7 @@ export class ImageFactory extends BaseFactory<DeckLayerProps> {
         data: rows,
         getBounds: (row) => this.getBounds(props, row, props.encoding?.position!.coordinates),
         unskewMatrix: props.viewport instanceof OrthographicViewport ? props.viewport.getUnskewMatrix() : [1, 0, 0, 1],
-        anchorPoint: ANCHOR_POINTS[props.encoding.position?.anchor ?? Anchor.CENTROID] ?? ANCHOR_POINTS[Anchor.CENTROID],
+        anchorPoint: getAnchorPoint(props.encoding.position?.anchor),
         image: this.getImageUrl(props, rows[0], allBounds, image),
         updateTriggers: {
           getBounds: super.getPositionUpdateTrigger(props.encoding.position, props.edit.isDragging, props.rows),

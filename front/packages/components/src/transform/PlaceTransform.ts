@@ -7,6 +7,7 @@ import { memoize } from '@hopara/memoize'
 import { Exclude } from 'class-transformer'
 import { FrontOnlyTransform } from './FrontOnlyTransform'
 import { drawGeometryFromDimensions } from '../place-transform/DrawGeometry'
+import { toUnskewedGeometry } from '../place-transform/PlacementGeometry'
 
 export class PlaceTransform extends FrontOnlyTransform {
   @Exclude()
@@ -41,7 +42,7 @@ export class PlaceTransform extends FrontOnlyTransform {
         viewState.unprojectCoordinate(Coordinates.fromArray(targetCentroid)),
       )
     })
-    return geometry
+    return toUnskewedGeometry(geometry as number[][], viewState)
   }
 
   apply(rows: Rows, columns: Columns, viewState: ViewState) : Rows {

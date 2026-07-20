@@ -2,6 +2,7 @@ import {getMeta} from '@hopara/resource'
 import {GetCoordinatesTransformProps, Transform} from './Transform'
 import { Coordinates, RowCoordinates } from '@hopara/spatial'
 import { drawTargetGeometry } from './DrawGeometry'
+import { toUnskewedGeometry } from './PlacementGeometry'
 import { ImageEncoding } from '@hopara/encoding'
 
 export class ImageTransform implements Transform {
@@ -28,6 +29,6 @@ export class ImageTransform implements Transform {
     const geometry = targetGeometry.map((coordinate) => {
       return viewState.unprojectCoordinate(Coordinates.fromArray(coordinate), targetZoom, placeCoordinates.toArray() as any)
     })
-    return new RowCoordinates({geometry})
+    return new RowCoordinates({geometry: toUnskewedGeometry(geometry as number[][], viewState)})
   }
 }

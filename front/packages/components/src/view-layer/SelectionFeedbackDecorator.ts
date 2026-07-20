@@ -14,6 +14,7 @@ import { Anchor, Bounds } from '@hopara/spatial'
 import { OrthographicViewport } from '../view/deck/OrthographicViewport'
 import { LayerFactoryChain } from './LayerFactoryChain'
 import { PathLayer } from 'deck.gl'
+import { getUnskewLayerProps } from './deck/unskew/UnskewExtension'
 
 export const SELECTION_LAYER_ID_SUFFIX = '#selectionFeedback'
 
@@ -74,6 +75,7 @@ export class SelectionFeedbackDecorator<P extends BaseViewLayerProps> extends La
   getGeometryDeckProps(props: P, selectedRow?: Row, feedbackType: 'hover' | 'edit' = 'hover') {
     const deckProps = {
       ...this.getDeckProps(props, selectedRow, feedbackType),
+      ...this.getUnskewProps(props, selectedRow),
       getPolygon: (row: Row) => {
         const geometry = row.getCoordinates().getGeometryLike() as any
         if (props.layerType === LayerType.line) return geometry
@@ -88,6 +90,15 @@ export class SelectionFeedbackDecorator<P extends BaseViewLayerProps> extends La
     } as any
 
     return decorateOffset(props as any, deckProps)
+  }
+
+  // The feedback outline must follow the image quad, which renders unskewed
+  private getUnskewProps(props: P, selectedRow?: Row) {
+    const geometry = selectedRow?.getCoordinates().getGeometryLike() as any
+    if (!geometry?.length || !((props as any).viewport instanceof OrthographicViewport)) return {}
+
+    const bounds = Bounds.fromGeometry(geometry, {orthographic: true})
+    return getUnskewLayerProps((props as any).viewport, [...bounds], props.encoding?.position?.anchor)
   }
 
     getPolygonDeckProps(props: P, selectedRow?: Row, feedbackType: 'hover' | 'edit' = 'hover') {
