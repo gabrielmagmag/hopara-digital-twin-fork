@@ -9,7 +9,9 @@ import {getSelectedLayer} from '../view-layer/deck/interaction/RowSelection'
 import {isEmpty, isNil} from 'lodash'
 import {getImageCandidates} from '../fit/ImageCandidates'
 import {RowSavedStatus} from './RowHistoryStore'
-import {Coordinates, toGeometry, toPoint, toPolygon} from '@hopara/spatial'
+import {Bounds, Coordinates, toGeometry, toPoint, toPolygon} from '@hopara/spatial'
+import {toUnskewedRenderPoint} from '../view-layer/deck/unskew/UnskewExtension'
+import {OrthographicViewport} from '../view/deck/OrthographicViewport'
 import {useMemo} from 'react'
 import ViewState from '../view-state/ViewState'
 import {Row, Rows} from '@hopara/dataset'
@@ -61,7 +63,14 @@ const getRowTopMidPointScreenCoordinates = (row: Row, selectedLayer: Layer, view
 
   const rotatedBoundsBBox = geometric.getBBox(rotatedRowBounds)
   const rotatedBBox = geometric.polygonRotate(rotatedBoundsBBox, (viewState?.bearing ?? 0), toPoint(rowCoordinates.to2DArray()))
-  const midpoint = geometric.getTopMidPoint(rotatedBBox).geometry.coordinates
+  let midpoint = geometric.getTopMidPoint(rotatedBBox).geometry.coordinates
+
+  // Image quads render unskewed (the image shader cancels the plane transform),
+  // so the toolbar anchor is mapped into that render space before projecting
+  if (selectedLayer.isType(LayerType.image) && rowCoordinates.isGeometryLike()) {
+    const bounds = Bounds.fromGeometry(rowGeometry as any, {orthographic: viewState.viewport instanceof OrthographicViewport})
+    midpoint = toUnskewedRenderPoint(midpoint, [...bounds], viewState.viewport, selectedLayer.encoding.position?.anchor)
+  }
 
   return rowCoordinates ? viewState?.projectCoordinate(Coordinates.fromArray(midpoint))! : []
 }
