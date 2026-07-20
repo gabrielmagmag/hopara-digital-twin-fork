@@ -92,3 +92,20 @@ export const getUnskewLayerProps = (viewport: any, bounds?: number[][], anchor?:
     unskewAnchor: getAnchorWorldPoint(bounds, anchor),
   }
 }
+
+// CPU mirror of the shader's unskew map (center + U·(point − anchor)): where a
+// world point of an unskew-rendered quad ends up in render space, so it can be
+// projected through the regular view matrix (e.g. to position DOM overlays).
+// Returns the point unchanged when there is nothing to cancel
+export const toUnskewedRenderPoint = (point: number[], quadCorners?: number[][], viewport?: any, anchor?: Anchor): number[] => {
+  if (!(viewport instanceof OrthographicViewport) || !quadCorners?.length) return point
+
+  const matrix = viewport.getUnskewMatrix()
+  if (isIdentity(matrix)) return point
+
+  const [cx, cy] = getAnchorWorldPoint(quadCorners, Anchor.CENTROID)
+  const [ax, ay] = getAnchorWorldPoint(quadCorners, anchor)
+  const dx = point[0] - ax
+  const dy = point[1] - ay
+  return [cx + matrix[0] * dx + matrix[2] * dy, cy + matrix[1] * dx + matrix[3] * dy, ...point.slice(2)]
+}
