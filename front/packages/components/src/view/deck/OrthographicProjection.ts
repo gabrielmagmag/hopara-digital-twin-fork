@@ -72,7 +72,10 @@ const ISOMETRIC_VERTICAL_SCALE = Math.tan(Math.PI / 6)
 export const getPlaneMatrix = ({rotation = 0, isometric = false}: {rotation?: number, isometric?: boolean}) => {
   const mat = new Matrix4()
   if (isometric) mat.scale([1, ISOMETRIC_VERTICAL_SCALE, 1]).rotateZ(ISOMETRIC_ROTATION)
-  if (rotation) mat.rotateZ(rotation * Math.PI / 180)
+  // Negated so a positive rotation offset turns the plane clockwise on screen,
+  // matching the artwork angle progression (angle = 45 + offset rotates the
+  // floorplan clockwise per 90° step)
+  if (rotation) mat.rotateZ(-rotation * Math.PI / 180)
   return mat
 }
 
