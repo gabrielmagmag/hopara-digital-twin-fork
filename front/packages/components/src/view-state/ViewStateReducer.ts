@@ -233,7 +233,7 @@ export const viewStateReducer: Reducer<ViewState | undefined, ActionTypes> = (st
       return state?.transitionRotate(rotation, action.payload.interval)
     }
     case getType(actions.navigation.viewRotateRequested): {
-      const step = action.payload.direction === 'left' ? -90 : 90
+      const step = action.payload.direction === 'clockwise' ? -90 : 90
       return state?.setRotationOffset((((state.rotationOffset ?? 0) + step) % 360 + 360) % 360)
     }
     case getType(actions.navigation.startAutoRotateClicked):

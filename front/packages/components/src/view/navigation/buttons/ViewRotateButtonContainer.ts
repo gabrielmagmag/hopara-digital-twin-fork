@@ -11,11 +11,11 @@ export const mapState = (): StateProps => {
 
 export const mapActions = (dispatch: Dispatch): ActionProps => {
   return {
-    onRotateLeftClick: () => {
-      dispatch(actions.navigation.viewRotateRequested({ direction: 'left' }))
+    onRotateClockwiseClick: () => {
+      dispatch(actions.navigation.viewRotateRequested({ direction: 'clockwise' }))
     },
-    onRotateRightClick: () => {
-      dispatch(actions.navigation.viewRotateRequested({ direction: 'right' }))
+    onRotateAnticlockwiseClick: () => {
+      dispatch(actions.navigation.viewRotateRequested({ direction: 'anticlockwise' }))
     },
   }
 }

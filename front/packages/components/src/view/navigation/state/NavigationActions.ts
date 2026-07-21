@@ -45,6 +45,6 @@ export const navigationActions = {
   onSearchCloseClicked: createAction('NAVIGATION_SEARCH_CLOSE_CLICKED')<void>(),
   actionClicked: createAction('NAVIGATION_ACTION_CLICKED')<{ action: Action, navigation: PageNavigation }>(),
   onViewCubeRotationChange: createAction('NAVIGATION_ON_VIEW_CUBE_ROTATION_CHANGE')<{ rotationX: number, rotationY: number }>(),
-  viewRotateRequested: createAction('NAVIGATION_VIEW_ROTATE_REQUESTED')<{ direction: 'left' | 'right' }>(),
+  viewRotateRequested: createAction('NAVIGATION_VIEW_ROTATE_REQUESTED')<{ direction: 'clockwise' | 'anticlockwise' }>(),
 }
 

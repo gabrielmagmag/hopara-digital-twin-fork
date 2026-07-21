@@ -12,8 +12,8 @@ export interface StateProps {
 }
 
 export interface ActionProps {
-  onRotateLeftClick: () => void
-  onRotateRightClick: () => void
+  onRotateClockwiseClick: () => void
+  onRotateAnticlockwiseClick: () => void
 }
 
 export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
@@ -22,19 +22,19 @@ export class ViewRotateButton extends PureComponent<StateProps & ActionProps> {
       <CanvasNavigationButtonGroup>
         <CanvasNavigationButton
           label={!cloudFeaturesEnabled
-            ? <CloudFeatureLabel featureName={i18n('VIEW_ROTATE_LEFT')}/>
-            : i18n('VIEW_ROTATE_LEFT')}
-          icon="view-rotate-left"
-          onClick={this.props.onRotateLeftClick}
+            ? <CloudFeatureLabel featureName={i18n('VIEW_ROTATE_CLOCKWISE')}/>
+            : i18n('VIEW_ROTATE_CLOCKWISE')}
+          icon="view-rotate-clockwise"
+          onClick={this.props.onRotateClockwiseClick}
           disabled={!cloudFeaturesEnabled}
           tooltipPlacement='right'
         />
         <CanvasNavigationButton
           label={!cloudFeaturesEnabled
-            ? <CloudFeatureLabel featureName={i18n('VIEW_ROTATE_RIGHT')}/>
-            : i18n('VIEW_ROTATE_RIGHT')}
-          icon="view-rotate-right"
-          onClick={this.props.onRotateRightClick}
+            ? <CloudFeatureLabel featureName={i18n('VIEW_ROTATE_ANTICLOCKWISE')}/>
+            : i18n('VIEW_ROTATE_ANTICLOCKWISE')}
+          icon="view-rotate-anticlockwise"
+          onClick={this.props.onRotateAnticlockwiseClick}
           disabled={!cloudFeaturesEnabled}
           tooltipPlacement='right'
         />
